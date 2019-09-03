@@ -6,7 +6,6 @@ using namespace std;
 
 #define CONSTRAIN(x,lower, upper) ( (x)<(lower)?(lower):((x)>(upper)?(upper):(x)))
 
-
 float actualSpeed = 0.0;
 float err = 0.0;
 float err_last = 0.0;
@@ -43,7 +42,7 @@ int count = 0;
 //	err = setSpeed - actualSpeed;
 //	
 //	int index = 0;
-//	if(abs(err) > 200){
+//	if(abs(err) > setSpeed){
 //		index = 0;
 //	}
 //	else{
@@ -61,7 +60,7 @@ int count = 0;
 //	err = setSpeed - actualSpeed;
 //	
 //	int index = 0;
-//	if(abs(err) > 200){
+//	if(abs(err) > setSpeed){
 //		index = 0;
 //	}
 //	else{
@@ -80,15 +79,15 @@ float PID_realize(float speed){//变积分型 (changeable integral)
 	err = setSpeed - actualSpeed;
 	
 	float index = 0;
-	if(abs(err) > 200){
+	if(abs(err) > setSpeed){
 		index = 0;
 	}
-	else if(abs(err) < 180){
+	else if(abs(err) < setSpeed * 0.9){
 		index = 1;
 		integral += err / 2;
 	}
 	else{
-		index = (200 - abs(err)) / 20;
+		index = (setSpeed - abs(err)) / 0.1 * setSpeed;
 		integral += err / 2;
 	}
 	voltage = Kp * err + index * Ki * integral + Kd * (err - err_last);
@@ -100,6 +99,6 @@ float PID_realize(float speed){//变积分型 (changeable integral)
 
 int main(){
 	for(int i = 0; i < 1000; i++){
-		cout << setw(3) << i << " : "<< PID_realize(200) << endl;
+		cout << setw(3) << i << " : "<< PID_realize(2000) << endl;
 	}
 }
