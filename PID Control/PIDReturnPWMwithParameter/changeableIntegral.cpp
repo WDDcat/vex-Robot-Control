@@ -11,11 +11,11 @@ using namespace std;
 #define KI_START_PERCENT 0.2
 #define KI_INDEX_PAR (1 - KI_START_PERCENT)
 
-float PID_realize(float target, float distance){//变积分型 (changeable integral)
+float PID_realize(float target, float current){//变积分型 (changeable integral)
 	static float err_last = 0.0;
 	static float voltage = 0.0;
 	static float integral = 0.0;		
-	float err = target - distance;
+	float err = target - current;
 	float voltage_last = voltage;
 	
 	float index = 0;
@@ -38,9 +38,9 @@ float PID_realize(float target, float distance){//变积分型 (changeable integral)
 }
 
 int main(){
-	float distance = 0.0, target = 2000.0;
+	float current = 0.0, target = 2000.0;
 	for(int i = 0; i < 500; i++){
-		distance += PID_realize(target, distance);
-		cout << setw(3) << i << " : "<< distance << endl;
+		current += PID_realize(target, current);
+		cout << setw(3) << i << " : "<< current << endl;
 	}
 }
