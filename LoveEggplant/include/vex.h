@@ -24,6 +24,13 @@
 #define ACTIVITY_MOTORINFO    0xFC
 #define ACTIVITY_ROBOTTEST    0xFB
 
+#define CONSTRAIN(x,lower, upper) ( (x)<(lower)?(lower):((x)>(upper)?(upper):(x)))
+#define KP 0.3
+#define KI 0.7
+#define KD 0.2
+#define KI_START_PERCENT 0.7
+#define KI_INDEX_PAR (1 - KI_START_PERCENT)
+
 using namespace vex;
 
 extern brain Brain;

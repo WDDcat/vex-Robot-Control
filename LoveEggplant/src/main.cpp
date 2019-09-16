@@ -88,7 +88,9 @@ void usercontrol( void ) {
   // User control code here, inside the loop
   int Ch1, Ch2, Ch3, Ch4;
   bool L1, L2, R1, R2, BtnA, BtnB, BtnX, BtnY, BtnU, BtnD, BtnL, BtnR;
-  while (1) {
+  go_forward(100, 250, 0);
+  Stop();
+  /*while (1) {
     Ch1 = Controller.Axis1.value();
     Ch2 = Controller.Axis2.value();
     Ch3 = Controller.Axis3.value();
@@ -122,7 +124,7 @@ void usercontrol( void ) {
     else        Intake(0);
 
     sleep(20); //Sleep the task for a short amount of time to prevent wasted resources. 
-  }
+  }*/
 }
 
 //
