@@ -1,1 +1,5 @@
 *.exe
+/.vscode
+/bin
+/build
+compile_commands.json
