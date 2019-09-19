@@ -1,8 +1,10 @@
+void Move(int lPower, int rPower);
+void Stop(vex::brakeType type = vex::brake);
+void Lift(int power);
+void Tray(int power, vex::brakeType type = vex::brake);
+void Intake(int power);
 
-void Move(int lSpeed, int rSpeed);
-void Stop();
-void Lift(int speed);
-void Tray(int speed);
-void Intake(int speed);
-
-bool go_forward(int speed, float target, float timeLimit);
+void spread();
+bool goForward(int power, float target, float timeLimit);
+bool Turn(int power, float target, float timeLimit);
+void backToWall(float power, int dis1, int dis2, int dis3, int dis4, int time, bool left);

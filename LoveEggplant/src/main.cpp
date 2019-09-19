@@ -10,8 +10,7 @@
 
 #include "screen.h"
 #include "motorControl.h"
-
-#define sleep(a) vex::task::sleep(a)
+#include "auto.h"
 
 using namespace vex;
 
@@ -24,7 +23,7 @@ motor RightMotor1(PORT10, gearSetting::ratio18_1, true);
 motor RightMotor2(PORT20, gearSetting::ratio18_1, true);
 motor LiftMotor(PORT1, gearSetting::ratio18_1, false);
 motor TrayMotor(PORT3, gearSetting::ratio18_1, true);
-motor LeftIntake(PORT7, gearSetting::ratio18_1, false);
+motor LeftIntake(PORT5, gearSetting::ratio18_1, false);
 motor RightIntake(PORT8, gearSetting::ratio18_1, true);
 limit LimitBack(Brain.ThreeWirePort.G);
 limit LimitFront(Brain.ThreeWirePort.A);
@@ -46,15 +45,8 @@ int auton = 1;
 
 void pre_auton( void ) {
   activity_loading("7258A");
-  while(true){
-    LeftIntake.spin(fwd, 100, pct);
-    RightIntake.spin(fwd, 100, pct);
-    onClickListener();
-    sleep(50);
-  }
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
-  
 }
 
 /*---------------------------------------------------------------------------*/
@@ -68,10 +60,10 @@ void pre_auton( void ) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous( void ) {
+  runAuto();
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
-
 }
 
 /*---------------------------------------------------------------------------*/
@@ -84,13 +76,12 @@ void autonomous( void ) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-void usercontrol( void ) {
+void drivercontrol( void ) {
   // User control code here, inside the loop
   int Ch1, Ch2, Ch3, Ch4;
   bool L1, L2, R1, R2, BtnA, BtnB, BtnX, BtnY, BtnU, BtnD, BtnL, BtnR;
-  go_forward(100, 250, 0);
   Stop();
-  /*while (1) {
+  while (1) {
     Ch1 = Controller.Axis1.value();
     Ch2 = Controller.Axis2.value();
     Ch3 = Controller.Axis3.value();
@@ -108,12 +99,28 @@ void usercontrol( void ) {
     BtnL = Controller.ButtonLeft.pressing();
     BtnR = Controller.ButtonRight.pressing();
 
-    if(abs(Ch3) > 10 || abs(Ch1) > 10){
+    //Tray comtrol
+    if(BtnX){
+      Tray(100);
+    }
+    else if(BtnB){
+      if(LimitBack.pressing()){
+        TrayMotor.resetRotation();
+        Tray(0, hold);
+      }
+      else{
+        Tray(-100);
+      }
+    }
+    else{
+      Tray(0, hold);
+    }
+
+    //Move control
+    if(abs(Ch3) > 5 || abs(Ch1) > 5){
       Move(Ch3 + Ch1, Ch3 - Ch1);
     }
-    else Move(0, 0);
-
-    Tray(Ch2);
+    else Stop(brake);
 
     if(L1)      Lift(100);
     else if(L2) Lift(-100);
@@ -123,8 +130,9 @@ void usercontrol( void ) {
     else if(R2) Intake(-100);
     else        Intake(0);
 
+    //onClickListener();
     sleep(20); //Sleep the task for a short amount of time to prevent wasted resources. 
-  }*/
+  }
 }
 
 //
@@ -133,7 +141,7 @@ void usercontrol( void ) {
 int main() {
     //Set up callbacks for autonomous and driver control periods.
     Competition.autonomous( autonomous );
-    Competition.drivercontrol( usercontrol );
+    Competition.drivercontrol( drivercontrol );
     
     //Run the pre-autonomous function. 
     pre_auton();
