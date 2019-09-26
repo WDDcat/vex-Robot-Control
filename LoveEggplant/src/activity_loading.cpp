@@ -21,7 +21,7 @@ void displayTeamNum(){
   Brain.Screen.printAt(132, 41, "%c", char5);
 }
 
-void activity_loading(string teamNum){
+void activity_loading(string teamNum, bool action){
   Brain.Screen.setFont(vex::fontType::mono60);
   char1 = teamNum.at(0);
   char2 = teamNum.at(1);
@@ -30,42 +30,44 @@ void activity_loading(string teamNum){
   if(teamNum.length() >= 5)
     char5 = teamNum.at(4);
 
-  for(int i = 0; i <= 40; i++){
-    Brain.Screen.printAt(2 * (i-1), SCREEN_MAX_HEIGHT / 2, " ");
-    Brain.Screen.printAt(2 * i, SCREEN_MAX_HEIGHT / 2, "%c", char1);
-    sleep(3);
-  }
-  sleep(5);
-
-  for(int i = 0; i <= 68; i++){
-    Brain.Screen.printAt(150, 2 * (i-1), " ");
-    Brain.Screen.printAt(150, 2*i, "%c", char2);
-    sleep(3);
-  }
-  sleep(5);
-
-  for(int i = 0; i <= 68; i++){
-    Brain.Screen.printAt(220, SCREEN_MAX_HEIGHT - 2 * (i-1), " ");
-    Brain.Screen.printAt(220, SCREEN_MAX_HEIGHT - 2*i, "%c", char3);
-    sleep(3);
-  }
-  sleep(5);
-
-  for(int i = 0; i <= 95; i++){
-    Brain.Screen.printAt(SCREEN_MAX_WIDTH - 2* (i-1), SCREEN_MAX_HEIGHT / 2, " ");
-    Brain.Screen.printAt(SCREEN_MAX_WIDTH - 2*i, SCREEN_MAX_HEIGHT / 2, "%c", char4);
-    sleep(3);
-  }
-  sleep(5);
-
-  if(char5 != ' '){
-    for(int i = 0; i < 50; i++){
-      char c = rand();
-      c = c % 26 + 'A';
-      Brain.Screen.printAt(360, SCREEN_MAX_HEIGHT / 2, "%c", c);
-      sleep(5);
+  if(action){
+    for(int i = 0; i <= 40; i++){
+      Brain.Screen.printAt(2 * (i-1), SCREEN_MAX_HEIGHT / 2, " ");
+      Brain.Screen.printAt(2 * i, SCREEN_MAX_HEIGHT / 2, "%c", char1);
+      sleep(3);
     }
-    Brain.Screen.printAt(360, SCREEN_MAX_HEIGHT / 2, "%c", char5);
+    sleep(5);
+
+    for(int i = 0; i <= 68; i++){
+      Brain.Screen.printAt(150, 2 * (i-1), " ");
+      Brain.Screen.printAt(150, 2*i, "%c", char2);
+      sleep(3);
+    }
+    sleep(5);
+
+    for(int i = 0; i <= 68; i++){
+      Brain.Screen.printAt(220, SCREEN_MAX_HEIGHT - 2 * (i-1), " ");
+      Brain.Screen.printAt(220, SCREEN_MAX_HEIGHT - 2*i, "%c", char3);
+      sleep(3);
+    }
+    sleep(5);
+
+    for(int i = 0; i <= 95; i++){
+      Brain.Screen.printAt(SCREEN_MAX_WIDTH - 2* (i-1), SCREEN_MAX_HEIGHT / 2, " ");
+      Brain.Screen.printAt(SCREEN_MAX_WIDTH - 2*i, SCREEN_MAX_HEIGHT / 2, "%c", char4);
+      sleep(3);
+    }
+    sleep(5);
+
+    if(char5 != ' '){
+      for(int i = 0; i < 50; i++){
+        char c = rand();
+        c = c % 26 + 'A';
+        Brain.Screen.printAt(360, SCREEN_MAX_HEIGHT / 2, "%c", c);
+        sleep(5);
+      }
+      Brain.Screen.printAt(360, SCREEN_MAX_HEIGHT / 2, "%c", char5);
+    }
   }
 
   sleep(200);

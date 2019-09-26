@@ -6,7 +6,7 @@ int getSreenTouch_menu();
 void activityControl(int selection);
 void onClickListener();
 
-void activity_loading(string teamNum);
+void activity_loading(string teamNum, bool action);
 void displayTeamNum();
 
 void activity_main();

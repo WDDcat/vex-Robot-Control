@@ -27,6 +27,9 @@
 #define KP 0.6
 #define KI 0.7
 #define KD 0.2
+#define KP_TURN 0.4
+#define KI_TURN 0.4
+#define KD_TURN 0.15
 #define KI_START_PERCENT 0.7
 #define KI_INDEX_PAR (1 - KI_START_PERCENT)
 
@@ -47,5 +50,6 @@ extern motor LeftIntake;
 extern motor RightIntake;
 extern limit LimitBack;
 extern limit LimitFront;
+extern gyro Gyro;
 
 extern int auton;

@@ -23,10 +23,11 @@ motor RightMotor1(PORT10, gearSetting::ratio18_1, true);
 motor RightMotor2(PORT20, gearSetting::ratio18_1, true);
 motor LiftMotor(PORT1, gearSetting::ratio18_1, false);
 motor TrayMotor(PORT3, gearSetting::ratio18_1, true);
-motor LeftIntake(PORT5, gearSetting::ratio18_1, false);
+motor LeftIntake(PORT6, gearSetting::ratio18_1, false);
 motor RightIntake(PORT8, gearSetting::ratio18_1, true);
-limit LimitBack(Brain.ThreeWirePort.G);
+limit LimitBack(Brain.ThreeWirePort.D);
 limit LimitFront(Brain.ThreeWirePort.A);
+gyro Gyro(Brain.ThreeWirePort.C);
 
 vex::competition Competition;
 
@@ -44,7 +45,25 @@ int auton = 1;
 /*---------------------------------------------------------------------------*/
 
 void pre_auton( void ) {
-  activity_loading("7258A");
+  Brain.Screen.setPenColor(vex::color::cyan);
+  Brain.Screen.setFont(vex::fontType::mono40);
+  Brain.Screen.printAt(80, 136, "Initializing...");
+  gyroInit();
+  while(true){
+    double cur = Gyro.value(vex::analogUnits::mV);
+    sleep(500);
+    if(cur == Gyro.value(vex::analogUnits::mV))
+      break;
+    else
+      gyroInit();
+  }
+  activity_loading("7258A", false);
+  // while(false){
+  //   double cur = Gyro.value(vex::analogUnits::mV);
+  //   Brain.Screen.setPenColor(vex::color::cyan);
+  //   Brain.Screen.setFont(vex::fontType::mono20);
+  //   Brain.Screen.printAt(40, 141, "%f", cur);
+  // }
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }
@@ -80,7 +99,6 @@ void drivercontrol( void ) {
   // User control code here, inside the loop
   int Ch1, Ch2, Ch3, Ch4;
   bool L1, L2, R1, R2, BtnA, BtnB, BtnX, BtnY, BtnU, BtnD, BtnL, BtnR;
-  Stop();
   while (1) {
     Ch1 = Controller.Axis1.value();
     Ch2 = Controller.Axis2.value();
@@ -130,7 +148,7 @@ void drivercontrol( void ) {
     else if(R2) Intake(-100);
     else        Intake(0);
 
-    //onClickListener();
+    onClickListener();
     sleep(20); //Sleep the task for a short amount of time to prevent wasted resources. 
   }
 }
