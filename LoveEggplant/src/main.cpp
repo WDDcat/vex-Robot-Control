@@ -23,7 +23,7 @@ motor RightMotor1(PORT10, gearSetting::ratio18_1, true);
 motor RightMotor2(PORT20, gearSetting::ratio18_1, true);
 motor LiftMotor(PORT1, gearSetting::ratio18_1, false);
 motor TrayMotor(PORT3, gearSetting::ratio18_1, true);
-motor LeftIntake(PORT6, gearSetting::ratio18_1, false);
+motor LeftIntake(PORT9, gearSetting::ratio18_1, false);
 motor RightIntake(PORT8, gearSetting::ratio18_1, true);
 limit LimitBack(Brain.ThreeWirePort.D);
 limit LimitFront(Brain.ThreeWirePort.A);
@@ -45,25 +45,27 @@ int auton = 1;
 /*---------------------------------------------------------------------------*/
 
 void pre_auton( void ) {
+  LeftIntake.setBrake(coast);
+  RightIntake.setBrake(coast);
   Brain.Screen.setPenColor(vex::color::cyan);
   Brain.Screen.setFont(vex::fontType::mono40);
   Brain.Screen.printAt(80, 136, "Initializing...");
   gyroInit();
   while(true){
     double cur = Gyro.value(vex::analogUnits::mV);
-    sleep(500);
-    if(cur == Gyro.value(vex::analogUnits::mV))
+    sleep(1000);
+    if(cur == Gyro.value(vex::analogUnits::mV) && Gyro.value(vex::analogUnits::mV) == 0)
       break;
     else
       gyroInit();
   }
   activity_loading("7258A", false);
-  // while(false){
-  //   double cur = Gyro.value(vex::analogUnits::mV);
-  //   Brain.Screen.setPenColor(vex::color::cyan);
-  //   Brain.Screen.setFont(vex::fontType::mono20);
-  //   Brain.Screen.printAt(40, 141, "%f", cur);
-  // }
+  while(true){
+    double cur = Gyro.value(vex::analogUnits::mV);
+    Brain.Screen.setPenColor(vex::color::cyan);
+    Brain.Screen.setFont(vex::fontType::mono20);
+    Brain.Screen.printAt(40, 141, "%f", cur);
+  }
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
 }

@@ -1,5 +1,7 @@
+#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_units.h"
 #include "vex.h"
 #include "motorControl.h"
+#include <ctime>
 
 void gyroInit(){
   Gyro.startCalibration();
@@ -9,11 +11,18 @@ void gyroInit(){
   sleep(3000);
 }
 
-void Move(int lPower, int rPower){
-  LeftMotor1.spin(fwd, lPower, pct);
-  LeftMotor2.spin(fwd, lPower, pct);
-  RightMotor1.spin(fwd, rPower, pct);
-  RightMotor2.spin(fwd, rPower, pct);
+// void Move(int lPower, int rPower){
+//   LeftMotor1.spin(fwd, lPower, pct);
+//   LeftMotor2.spin(fwd, lPower, pct);
+//   RightMotor1.spin(fwd, rPower, pct);
+//   RightMotor2.spin(fwd, rPower, pct);
+// }
+
+void Move(double lPower, double rPower){
+  LeftMotor1.spin(fwd, lPower, voltageUnits::volt);
+  LeftMotor2.spin(fwd, lPower, voltageUnits::volt);
+  RightMotor1.spin(fwd, rPower, voltageUnits::volt);
+  RightMotor2.spin(fwd, rPower, voltageUnits::volt);
 }
 
 void Stop(brakeType type){
@@ -28,7 +37,7 @@ void Lift(int power){
     LiftMotor.stop(hold);
   }
   else{
-    LiftMotor.spin(fwd, power, pct);
+    LiftMotor.spin(fwd, power, voltageUnits::volt);
   }
 }
 
@@ -42,8 +51,13 @@ void Tray(int power, brakeType type){
 }
 
 void Intake(int speed){
-  LeftIntake.spin(fwd, speed, pct);
-  RightIntake.spin(fwd, speed, pct);
+  LeftIntake.spin(fwd, speed, voltageUnits::volt);
+  RightIntake.spin(fwd, speed, voltageUnits::volt);
+}
+
+void Intake(float power){
+  LeftIntake.spin(fwd, power, voltageUnits::volt);
+  RightIntake.spin(fwd, power, voltageUnits::volt);
 }
 
 //////////////////////AUTO CONTROL////////////////////////
@@ -53,6 +67,8 @@ void spread(){
   }
   Tray(-5);
   sleep(20);
+  Tray(0, hold);
+  Intake(100);
 }
 
 bool goForward(int power, float target, float timeLimit){
@@ -68,7 +84,8 @@ bool goForward(int power, float target, float timeLimit){
   float indexR = 0.0;
   LeftMotor2.resetRotation();
   RightMotor2.resetRotation();
-	while(1){
+  Brain.resetTimer();
+	while(Brain.timer(msec) < timeLimit){
     float curL = LeftMotor2.rotation(deg);
     float curR = RightMotor2.rotation(deg);
 		errL = target - curL;
@@ -100,14 +117,14 @@ bool goForward(int power, float target, float timeLimit){
 		
 		voltL = KP * errL + indexL * KI * integralL + KD * (errL - err_lastL);
     voltR = KP * errR + indexR * KI * integralR + KD * (errR - err_lastR);
-    if(voltL < 0.01 || voltR < 0.01) return true;
+    if(voltL < 1 || voltR < 1) return true;
 		integralL += errL / 2;
     integralR += errR / 2;
 		err_lastL = errL;
     err_lastR = errR;
 		
-    float rpmAdjust = 1.0 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm));
-		float rotationAdjust = 2.0 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg));
+    float rpmAdjust = 1.5 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm)) * (curL / target);
+		float rotationAdjust = 0.5 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg)) * (curL / target);
     Move(CONSTRAIN(voltL - rpmAdjust - rotationAdjust, 0, power),
          CONSTRAIN(voltR + rpmAdjust + rotationAdjust, 0, power));
 	}
@@ -127,7 +144,8 @@ bool goBackward(int power, float target, float timeLimit){
   float indexR = 0.0;
   LeftMotor2.resetRotation();
   RightMotor2.resetRotation();
-	while(1){
+  Brain.resetTimer();
+	while(Brain.timer(msec) < timeLimit){
     float curL = LeftMotor2.rotation(deg);
     float curR = RightMotor2.rotation(deg);
 		errL = target + curL;
@@ -157,16 +175,16 @@ bool goBackward(int power, float target, float timeLimit){
 			integralR += errR / 2;
 		}
 		
-		voltL = KP * errL + indexL * KI * integralL + KD * (errL - err_lastL);
-    voltR = KP * errR + indexR * KI * integralR + KD * (errR - err_lastR);
-    if(voltL < 0.01 || voltR < 0.01) return true;
+		voltL = 0.5 * KP * errL + indexL * KI * integralL + KD * (errL - err_lastL);
+    voltR = 0.5 * KP * errR + indexR * KI * integralR + KD * (errR - err_lastR);
+    if(voltL < 1 || voltR < 1) return true;
 		integralL += errL / 2;
     integralR += errR / 2;
 		err_lastL = errL;
     err_lastR = errR;
 		
-    float rpmAdjust = 1.0 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm));
-		float rotationAdjust = 2.0 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg));
+    float rpmAdjust = 1.5 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm)) * (-curL / target);
+		float rotationAdjust = 0.5 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg)) * (-curL / target);
     Move(CONSTRAIN(- voltL + rpmAdjust + rotationAdjust, -power, 0),
          CONSTRAIN(- voltR - rpmAdjust - rotationAdjust, -power, 0));
 	}
@@ -174,21 +192,22 @@ bool goBackward(int power, float target, float timeLimit){
 }
 
 void backToWall(float power, int dis1, int dis2, int dis3, int dis4, int time, bool left){
-  float k = 0.4;
+  float k1 = 0.5;
+  float k2 = 0.3;
   LeftMotor2.resetRotation();
   while(LeftMotor2.rotation(vex::rotationUnits::deg) > -dis1) {
     Move(-power, -power);
   }
   if(left){
     RightMotor2.resetRotation();
-    while(RightMotor2.rotation(vex::rotationUnits::deg) > -dis2) {
-      Move(-power * k, -power);
+    while(RightMotor2.rotation(deg) > -dis2) {
+      Move(-power * k1, -power);
     }
   }
   else{
     LeftMotor2.resetRotation();
-    while(LeftMotor2.rotation(vex::rotationUnits::deg) > -dis2) {
-      Move(-power, -power *k);
+    while(LeftMotor2.rotation(deg) > -dis2) {
+      Move(-power, -power *k1);
     }
   }
 
@@ -200,13 +219,13 @@ void backToWall(float power, int dis1, int dis2, int dis3, int dis4, int time, b
   if(left){
     LeftMotor2.resetRotation();
     while(LeftMotor2.rotation(vex::rotationUnits::deg) > -dis4) {
-      Move(-power, -power * k);
+      Move(-power, -power * k2);
     }
   }
   else{
     RightMotor2.resetRotation();
     while(RightMotor2.rotation(vex::rotationUnits::deg) > -dis4) {
-      Move(-power * k, -power);
+      Move(-power * k2, -power);
     }
   }
 
@@ -341,8 +360,8 @@ bool turnLeftWithGyro(int power, float target, float timeLimit){
   float err_next = 0.0;
 	float volt = 0.0;
 	//float integral = 0.0;
-
-	while(1){
+  Brain.resetTimer();
+	while(Brain.timer(msec) < timeLimit){
     double cur = Gyro.value(vex::analogUnits::mV);
 		if(cur < target){
       return true;
@@ -360,14 +379,12 @@ bool turnLeftWithGyro(int power, float target, float timeLimit){
 }
 
 bool turnRightWithGyro(int power, float target, float timeLimit){
-  target = target / 90.0 * 800.0;
 	float err = 0.0;
 	float err_last = 0.0;
   float err_next = 0.0;
 	float volt = 0.0;
-	//float integral = 0.0;
-
-	while(1){
+  Brain.resetTimer();
+	while(Brain.timer(msec) < timeLimit){
     double cur = Gyro.value(vex::analogUnits::mV);
 		if(cur > target){
       return true;
