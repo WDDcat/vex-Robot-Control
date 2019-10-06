@@ -1,22 +1,29 @@
 #include "vex.h"
 #include "motorControl.h"
 #include "auto.h"
+#include "GyroLib.h"
+
+extern int auton;
 
 void runAuto(){
+  //spread();
+  while (!GyroGetValid()) sleep(10);
   switch(auton){
   case 1:
-    auto2();
-    break;
+    auto1();  break;
   case 2:
-    auto2();
-    break;
+    auto2();  break;
+  case 3:
+    auto3();  break;
+  case 4:
+    auto4();  break;
   default:
     break;
   }
+
 }
 
 void auto1(){
-  spread();
   if(!goForward(47, 700, 3000))  goto INTERRUPT;
   Lift(-15);
   Stop(brake);
@@ -66,7 +73,6 @@ INTERRUPT:
 }
 
 void auto2(){
-  spread();
   Lift(-15);
   if(!goForward(5, 700, 3000))  goto INTERRUPT;
   // Stop(brake);
@@ -111,11 +117,6 @@ INTERRUPT:
 }
 
 void auto3(){
-  // Gyro.startCalibration();
-  // while(Gyro.isCalibrating()){
-  //   sleep(1);
-  // }
-  // sleep(3000);
   turnRightWithGyro(50, 90, 0);
   Stop();
   while(true){
@@ -125,4 +126,19 @@ void auto3(){
     Brain.Screen.printAt(40, 141, "%f", cur);
   }
   Intake(50);
+}
+
+void auto4(){
+  if(!goForward(47, 700, 3000))  goto INTERRUPT;
+  // Intake(0);
+  Stop(hold);
+  if(!turnRightWithGyro(60, 29, 4000)) goto INTERRUPT;
+  Move(-100,-100);
+  sleep(2000);
+  Stop();
+  goto INTERRUPT;
+INTERRUPT:
+  Intake(50);
+  Stop();
+  return;
 }

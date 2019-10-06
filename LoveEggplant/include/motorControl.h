@@ -1,5 +1,5 @@
 void gyroInit();
-void Move(double lPower, double rPower);
+void Move(float lPower, float rPower);
 void Stop(vex::brakeType type = vex::brake);
 void Lift(int power);
 void Tray(int power, vex::brakeType type = vex::brake);

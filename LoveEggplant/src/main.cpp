@@ -11,28 +11,29 @@
 #include "screen.h"
 #include "motorControl.h"
 #include "auto.h"
+#include "GyroLib.h"
 
 using namespace vex;
 
 brain Brain;
 controller Controller = controller();
-
-motor LeftMotor1(PORT4, gearSetting::ratio18_1, false);
-motor LeftMotor2(PORT11, gearSetting::ratio18_1, false);
-motor RightMotor1(PORT10, gearSetting::ratio18_1, true);
-motor RightMotor2(PORT20, gearSetting::ratio18_1, true);
-motor LiftMotor(PORT1, gearSetting::ratio18_1, false);
-motor TrayMotor(PORT3, gearSetting::ratio18_1, true);
-motor LeftIntake(PORT9, gearSetting::ratio18_1, false);
-motor RightIntake(PORT8, gearSetting::ratio18_1, true);
-limit LimitBack(Brain.ThreeWirePort.D);
-limit LimitFront(Brain.ThreeWirePort.A);
-gyro Gyro(Brain.ThreeWirePort.C);
+//4 11 10 20 1 3 9 8 D A C
+motor LeftMotor1  (PORT12,   gearSetting::ratio18_1, false);
+motor LeftMotor2  (PORT13,   gearSetting::ratio18_1, false);
+motor RightMotor1 (PORT15,   gearSetting::ratio18_1, true);
+motor RightMotor2 (PORT14,   gearSetting::ratio18_1, true);
+motor LiftMotor   (PORT8,    gearSetting::ratio18_1, false);
+motor TrayMotor   (PORT19,   gearSetting::ratio18_1, true);
+motor LeftIntake  (PORT9,    gearSetting::ratio18_1, false);
+motor RightIntake (PORT5,    gearSetting::ratio18_1, true);
+limit LimitBack   (Brain.ThreeWirePort.F);
+limit LimitFront  (Brain.ThreeWirePort.E);
+gyro Gyro         (Brain.ThreeWirePort.C);
 
 vex::competition Competition;
 
 // define your global instances of motors and other devices here
-int auton = 1;
+int auton = 4;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -47,24 +48,16 @@ int auton = 1;
 void pre_auton( void ) {
   LeftIntake.setBrake(coast);
   RightIntake.setBrake(coast);
-  Brain.Screen.setPenColor(vex::color::cyan);
-  Brain.Screen.setFont(vex::fontType::mono40);
-  Brain.Screen.printAt(80, 136, "Initializing...");
+  
   gyroInit();
-  while(true){
-    double cur = Gyro.value(vex::analogUnits::mV);
-    sleep(1000);
-    if(cur == Gyro.value(vex::analogUnits::mV) && Gyro.value(vex::analogUnits::mV) == 0)
-      break;
-    else
-      gyroInit();
-  }
+  task setGyro(GyroTask);
+
   activity_loading("7258A", false);
   while(true){
-    double cur = Gyro.value(vex::analogUnits::mV);
+    double cur = GyroGetAngle();
     Brain.Screen.setPenColor(vex::color::cyan);
     Brain.Screen.setFont(vex::fontType::mono20);
-    Brain.Screen.printAt(40, 141, "%f", cur);
+    Brain.Screen.printAt(40, 70, "%f", cur);
   }
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
@@ -140,7 +133,7 @@ void drivercontrol( void ) {
     if(abs(Ch3) > 5 || abs(Ch1) > 5){
       Move(Ch3 + Ch1, Ch3 - Ch1);
     }
-    else Stop(brake);
+    else Stop(coast);
 
     if(L1)      Lift(100);
     else if(L2) Lift(-100);
@@ -168,7 +161,7 @@ int main() {
        
     //Prevent main from exiting with an infinite loop.                        
     while(1) {
-      sleep(100);//Sleep the task for a short amount of time to prevent wasted resources.
+      sleep(50);//Sleep the task for a short amount of time to prevent wasted resources.
     }    
        
 }

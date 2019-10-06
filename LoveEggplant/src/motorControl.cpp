@@ -1,14 +1,33 @@
-#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_units.h"
 #include "vex.h"
 #include "motorControl.h"
+#include "GyroLib.h"
 #include <ctime>
 
 void gyroInit(){
-  Gyro.startCalibration();
-  while(Gyro.isCalibrating()){
-    sleep(1);
+  Brain.Screen.setPenColor(vex::color::cyan);
+  Brain.Screen.setFont(vex::fontType::mono40);
+  Brain.Screen.printAt(80, 136, "Initializing...");
+  while(true){
+    Gyro.startCalibration();
+    while(Gyro.isCalibrating()){
+      sleep(1);
+    }
+    int i = 30;
+    while (i-->0) {
+      Controller.rumble("-");
+      sleep(100);
+    }
+    double cur = Gyro.value(vex::analogUnits::mV);
+    i = 10;
+    while (i-->0) {
+      Controller.rumble("-");
+      sleep(100);
+    }
+    if(cur == Gyro.value(vex::analogUnits::mV) && Gyro.value(vex::analogUnits::mV) == 0)
+      break;
   }
-  sleep(3000);
+  Controller.rumble(" ");
+  Brain.Screen.clearScreen();
 }
 
 // void Move(int lPower, int rPower){
@@ -18,11 +37,11 @@ void gyroInit(){
 //   RightMotor2.spin(fwd, rPower, pct);
 // }
 
-void Move(double lPower, double rPower){
-  LeftMotor1.spin(fwd, lPower, voltageUnits::volt);
-  LeftMotor2.spin(fwd, lPower, voltageUnits::volt);
-  RightMotor1.spin(fwd, rPower, voltageUnits::volt);
-  RightMotor2.spin(fwd, rPower, voltageUnits::volt);
+void Move(float lPower, float rPower){
+  LeftMotor1.spin(fwd, 0.128 * lPower, voltageUnits::volt);
+  LeftMotor2.spin(fwd, 0.128 * lPower, voltageUnits::volt);
+  RightMotor1.spin(fwd, 0.128 * rPower, voltageUnits::volt);
+  RightMotor2.spin(fwd, 0.128 * rPower, voltageUnits::volt);
 }
 
 void Stop(brakeType type){
@@ -37,7 +56,7 @@ void Lift(int power){
     LiftMotor.stop(hold);
   }
   else{
-    LiftMotor.spin(fwd, power, voltageUnits::volt);
+    LiftMotor.spin(fwd, power, pct);
   }
 }
 
@@ -62,12 +81,12 @@ void Intake(float power){
 
 //////////////////////AUTO CONTROL////////////////////////
 void spread(){
-  while(!LimitBack.pressing()){
-    Tray(-100);
-  }
-  Tray(-5);
-  sleep(20);
-  Tray(0, hold);
+  // while(!LimitBack.pressing()){
+  //   Tray(-100);
+  // }
+  // Tray(-5);
+  // sleep(20);
+  // Tray(0, hold);
   Intake(100);
 }
 
@@ -213,7 +232,7 @@ void backToWall(float power, int dis1, int dis2, int dis3, int dis4, int time, b
 
   LeftMotor2.resetRotation();
   while(LeftMotor2.rotation(vex::rotationUnits::deg) > -dis3) {
-    Move(-100, -100);
+    Move(-100.0, -100.0);
   }
 
   if(left){
@@ -379,24 +398,41 @@ bool turnLeftWithGyro(int power, float target, float timeLimit){
 }
 
 bool turnRightWithGyro(int power, float target, float timeLimit){
+  /*
 	float err = 0.0;
 	float err_last = 0.0;
   float err_next = 0.0;
 	float volt = 0.0;
   Brain.resetTimer();
 	while(Brain.timer(msec) < timeLimit){
-    double cur = Gyro.value(vex::analogUnits::mV);
+    double cur = GyroGetAngle();
 		if(cur > target){
       return true;
     }
 
     err = target - cur;
-    volt = KP_TURN * (err - err_next) + KI_TURN * err + KD_TURN * (err - 2*err_next + err_last);
+    volt = KP_TURN * err + KI_TURN * (err - err_next) + KD_TURN * (err - 2*err_next + err_last);
 	  err_last = err;
 	  err_next = err;
     Move(volt, -volt);
 
     sleep(2);
 	}
-  return false;
+  return false;*/
+  float cur = GyroGetAngle();
+  float err = target - cur, last_err = 0, total_err = 0, delta_err = 10, OUT;
+  while (fabs(err) > 1) {
+    cur = GyroGetAngle();
+    last_err = err;
+    err = target - cur;
+    total_err += err;
+    delta_err = err - last_err;
+
+    OUT = KP_TURN * err + KI_TURN * total_err + KD_TURN * delta_err;
+
+    Move(OUT, -OUT);
+
+    sleep(100);
+  }
+  return true;
 }
