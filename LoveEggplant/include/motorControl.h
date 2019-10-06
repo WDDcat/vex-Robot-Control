@@ -1,9 +1,10 @@
 void gyroInit();
 void Move(float lPower, float rPower);
+void sMove(float lPower, float rPower);
 void Stop(vex::brakeType type = vex::brake);
 void Lift(int power);
 void Tray(int power, vex::brakeType type = vex::brake);
-void Intake(int power);
+void Intake(float power);
 
 void spread();
 bool goForward(int power, float target, float timeLimit);

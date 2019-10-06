@@ -7,20 +7,30 @@ void gyroInit(){
   Brain.Screen.setPenColor(vex::color::cyan);
   Brain.Screen.setFont(vex::fontType::mono40);
   Brain.Screen.printAt(80, 136, "Initializing...");
-  while(true){
+      Gyro.startCalibration();
+    while(Gyro.isCalibrating()){
+      sleep(1);
+    }
+    int i = 30;
+    while (i-->0) {
+      Controller.rumble(".");
+      sleep(100);
+    }
+    sleep(3000);
+  while(0){
     Gyro.startCalibration();
     while(Gyro.isCalibrating()){
       sleep(1);
     }
     int i = 30;
     while (i-->0) {
-      Controller.rumble("-");
+      Controller.rumble(".");
       sleep(100);
     }
     double cur = Gyro.value(vex::analogUnits::mV);
     i = 10;
     while (i-->0) {
-      Controller.rumble("-");
+      Controller.rumble(".");
       sleep(100);
     }
     if(cur == Gyro.value(vex::analogUnits::mV) && Gyro.value(vex::analogUnits::mV) == 0)
@@ -42,6 +52,13 @@ void Move(float lPower, float rPower){
   LeftMotor2.spin(fwd, 0.128 * lPower, voltageUnits::volt);
   RightMotor1.spin(fwd, 0.128 * rPower, voltageUnits::volt);
   RightMotor2.spin(fwd, 0.128 * rPower, voltageUnits::volt);
+}
+
+void sMove(float lPower, float rPower){
+  LeftMotor1.spin(fwd, 2*lPower, rpm);
+  LeftMotor2.spin(fwd, 2*lPower, rpm);
+  RightMotor1.spin(fwd, 2*rPower, rpm);
+  RightMotor2.spin(fwd, 2*rPower, rpm);
 }
 
 void Stop(brakeType type){
@@ -69,14 +86,9 @@ void Tray(int power, brakeType type){
   }
 }
 
-void Intake(int speed){
-  LeftIntake.spin(fwd, speed, voltageUnits::volt);
-  RightIntake.spin(fwd, speed, voltageUnits::volt);
-}
-
 void Intake(float power){
-  LeftIntake.spin(fwd, power, voltageUnits::volt);
-  RightIntake.spin(fwd, power, voltageUnits::volt);
+  LeftIntake.spin(fwd, 0.12 * power, voltageUnits::volt);
+  RightIntake.spin(fwd, 0.12 * power, voltageUnits::volt);
 }
 
 //////////////////////AUTO CONTROL////////////////////////
@@ -143,7 +155,7 @@ bool goForward(int power, float target, float timeLimit){
     err_lastR = errR;
 		
     float rpmAdjust = 1.5 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm)) * (curL / target);
-		float rotationAdjust = 0.5 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg)) * (curL / target);
+		float rotationAdjust = 1.5 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg)) * (curL / target);
     Move(CONSTRAIN(voltL - rpmAdjust - rotationAdjust, 0, power),
          CONSTRAIN(voltR + rpmAdjust + rotationAdjust, 0, power));
 	}
@@ -420,19 +432,21 @@ bool turnRightWithGyro(int power, float target, float timeLimit){
 	}
   return false;*/
   float cur = GyroGetAngle();
-  float err = target - cur, last_err = 0, total_err = 0, delta_err = 10, OUT;
-  while (fabs(err) > 1) {
+  float err = target - cur, last_err = 0, total_err = 0, delta_err = 0, OUT;
+  int startTime = Brain.timer(timeUnits::msec);
+  while (fabs(err) > 0.5 && Brain.timer(timeUnits::msec) - startTime < timeLimit) {
     cur = GyroGetAngle();
     last_err = err;
     err = target - cur;
-    total_err += err;
+    total_err += delta_err;
     delta_err = err - last_err;
 
     OUT = KP_TURN * err + KI_TURN * total_err + KD_TURN * delta_err;
 
-    Move(OUT, -OUT);
+    sMove(OUT, -OUT);
 
-    sleep(100);
+    sleep(10);
   }
+  Stop(hold);
   return true;
 }

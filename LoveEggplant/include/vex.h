@@ -30,13 +30,13 @@
 #define KP_TURN_BIG 1.4
 #define KI_TURN_BIG 0.06
 #define KD_TURN_BIG 3.0
-#define KP_TURN 1.45
-#define KI_TURN 0.075
-#define KD_TURN 3.2
+#define KP_TURN 0.44
+#define KI_TURN 0.0045
+#define KD_TURN 0.6
 #define KI_START_PERCENT 0.7
 #define KI_INDEX_PAR (1 - KI_START_PERCENT)
 
-#define CONSTRAIN(x,lower, upper) ( (x)<(lower)?(lower):((x)>(upper)?(upper):(x)))
+#define CONSTRAIN(x, lower, upper) ((x)<(lower)?(lower):((x)>(upper)?(upper):(x)))
 #define sleep(a) vex::task::sleep(a)
 
 using namespace vex;

@@ -129,16 +129,22 @@ void auto3(){
 }
 
 void auto4(){
-  if(!goForward(47, 700, 3000))  goto INTERRUPT;
-  // Intake(0);
+  Intake(100);
+  if(!goForward(60, 700, 3000))  goto INTERRUPT;
   Stop(hold);
-  if(!turnRightWithGyro(60, 29, 4000)) goto INTERRUPT;
+  sleep(700);
+  if(!turnRightWithGyro(60, 33.3, 8000)) goto INTERRUPT;
   Move(-100,-100);
-  sleep(2000);
+  sleep(1000);
+  Stop(coast);
+  sleep(200);
+  Move(-35, -35);
+  sleep(800);
   Stop();
+  if(!goForward(30, 700, 3000))  goto INTERRUPT;
   goto INTERRUPT;
 INTERRUPT:
-  Intake(50);
+  Intake(20);
   Stop();
   return;
 }

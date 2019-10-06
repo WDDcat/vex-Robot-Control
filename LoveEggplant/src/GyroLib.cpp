@@ -28,7 +28,7 @@ int GyroTask() {
         gyro_value = Gyro.value(vex::analogUnits::mV);
 
         if (Brain.Timer.time() - nSysTimeOffset > 250) {
-            if (fabs(gyro_value - lastDriftGyro) < 2) {
+            if (fabs(gyro_value - lastDriftGyro) < 3) {
                 gyro_error += (lastDriftGyro - gyro_value);
             }
             lastDriftGyro = gyro_value;
