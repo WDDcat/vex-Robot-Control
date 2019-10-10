@@ -22,16 +22,16 @@ controller Controller = controller();
 //PeiLianChe   //12 13 15 14 8 19 9 5 F E C
 //Wangshengfei  //3 15 7 6 4 10 11 13 A E C
 
-motor LeftMotor1  (PORT3,   gearSetting::ratio18_1, false);
-motor LeftMotor2  (PORT15,   gearSetting::ratio18_1, false);
-motor RightMotor1 (PORT7,   gearSetting::ratio18_1, true);
-motor RightMotor2 (PORT6,   gearSetting::ratio18_1, true);
-motor LiftMotor   (PORT4,    gearSetting::ratio18_1, false);
-motor TrayMotor   (PORT10,   gearSetting::ratio18_1, true);
-motor LeftIntake  (PORT11,    gearSetting::ratio18_1, false);
-motor RightIntake (PORT13,    gearSetting::ratio18_1, true);
-limit LimitBack   (Brain.ThreeWirePort.A);
-limit LimitFront  (Brain.ThreeWirePort.E);
+motor LeftMotor1  (PORT4,   gearSetting::ratio18_1, false);
+motor LeftMotor2  (PORT11,   gearSetting::ratio18_1, false);
+motor RightMotor1 (PORT10,   gearSetting::ratio18_1, true);
+motor RightMotor2 (PORT20,   gearSetting::ratio18_1, true);
+motor LiftMotor   (PORT1,    gearSetting::ratio18_1, false);
+motor TrayMotor   (PORT3,   gearSetting::ratio18_1, true);
+motor LeftIntake  (PORT9,    gearSetting::ratio18_1, false);
+motor RightIntake (PORT8,    gearSetting::ratio18_1, true);
+limit LimitBack   (Brain.ThreeWirePort.D);
+limit LimitFront  (Brain.ThreeWirePort.A);
 gyro Gyro         (Brain.ThreeWirePort.C);
 
 vex::competition Competition;
