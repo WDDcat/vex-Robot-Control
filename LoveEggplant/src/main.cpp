@@ -18,9 +18,7 @@ using namespace vex;
 
 brain Brain;
 controller Controller = controller();
-//DongYunZhang //4 11 10 20 1 3 9 8 D A C 
 //PeiLianChe   //12 13 15 14 8 19 9 5 F E C
-
 motor LeftMotor1  (PORT3,   gearSetting::ratio18_1, false);
 motor LeftMotor2  (PORT15,   gearSetting::ratio18_1, false);
 motor RightMotor1 (PORT7,   gearSetting::ratio18_1, true);
