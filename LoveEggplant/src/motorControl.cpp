@@ -106,18 +106,19 @@ void spread(){
   while(!LimitBack.pressing()){
     Tray(-100);
   }
+  TrayMotor.resetRotation();
   Tray(-5);
   sleep(20);
   Tray(0, hold);
   LeftMotor1.resetRotation();
   while(LeftMotor1.rotation(deg) < 360){
-    if(LeftMotor1.rotation(deg) < 220)  Move(60, 60);
+    if(LeftMotor1.rotation(deg) < 220)  Move(70, 70);
     else                                Move(40, 40);
   }
   Move(-60, -60);
   sleep(400);
   Intake(-100);
-  sleep(500);
+  sleep(450);
   Intake(100);
 }
 
@@ -417,7 +418,7 @@ bool turnLeftWithGyro(int power, float target, float timeLimit){
     if(cur / target > KI_TURN_START_PERCENT)
       total_err += err;
     delta_err = err - last_err;
-    if(fabs(err) <= 0.6) {
+    if(err >= -0.6) {
       return true;
     }
 
@@ -464,7 +465,7 @@ bool turnRightWithGyro(int power, float target, float timeLimit){
     if(cur / target > KI_TURN_START_PERCENT)
       total_err += err;
     delta_err = err - last_err;
-    if(fabs(err) <= 0.6) {
+    if(err <= 0.6) {
       return true;
     }
 

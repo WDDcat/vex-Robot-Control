@@ -28,7 +28,7 @@
 #define KP 0.7
 #define KI 0.07//0.7
 #define KD 12.0//15.0
-#define KP_TURN 0.52//0.42
+#define KP_TURN 0.51//0.42
 #define KI_TURN 0.003//0.002
 #define KD_TURN 35.0//4.0
 #define KI_START_PERCENT 0.95

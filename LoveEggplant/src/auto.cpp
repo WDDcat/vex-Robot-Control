@@ -116,58 +116,70 @@ INTERRUPT:
 }
 
 void auto3(){
-  // bool turn = true;
   float angleErr = 0.0;
   spread();
   LeftMotor1.resetRotation();
   while(LeftMotor1.rotation(deg) < 150){
-    Move(100, 100);
+    Move(200 - LeftMotor1.rotation(deg), 200 - LeftMotor1.rotation(deg));
   }
   if(!goForward(35, 760, 2300)) goto INTERRUPT;
   Stop(hold);
   angleErr += GyroGetAngle();
-  turnRightWithGyro(60, 47.0, 800);
+  turnRightWithGyro(60, 46.0, 650);
   Stop(hold);
+  sleep(100);
+  Brain.resetTimer();
   LeftMotor1.resetRotation();
-  while(LeftMotor1.rotation(deg) > -760){
+  while(LeftMotor1.rotation(deg) > -700){//500
     Move(-100, -100);
   }
-  Move(-55, -20);
-  sleep(500);
+  Move(-45, -30);
+  sleep(700);
   Move(-20, -20);
-  sleep(200);
+  sleep(400);
+  Brain.Screen.setPenColor(vex::color::cyan);
+  Brain.Screen.setFont(vex::fontType::mono40);
+  Brain.Screen.printAt(40, 150, "%f", Brain.timer(msec));
   Stop();
-  if(!goForward(30, 950, 3500))  goto INTERRUPT;
+  LeftMotor1.resetRotation();
+  while(LeftMotor1.rotation(deg) < 150){
+    float speed = 180 - LeftMotor1.rotation(deg);
+    Move(CONSTRAIN(speed, 42, 90), CONSTRAIN(speed, 42, 90));
+  }
+  if(!goForward(32, 820, 3800))  goto INTERRUPT;
   Stop(hold);
   angleErr += GyroGetAngle();
-  sleep(150);
+  sleep(90);
   if(GyroGetAbsAngle() > 10){
     if(GyroGetAngle() > 0)  turnRightWithGyro(60, 0, 500);
     else                    turnLeftWithGyro(60, 0, 500);
   }
   LeftMotor1.resetRotation();
-  TrayMotor.startRotateTo(300, deg);
-  if(!goBackward(100, -540, 2000)) goto INTERRUPT;
+  if(!goBackward(100, -330, 2000)) goto INTERRUPT;
   Intake(0);
-  Tray(0,hold);
-  turnLeftWithGyro(90, -174.0 + angleErr * 1.2, 1800);
-  Move(60, 60);
-  sleep(950 - 0 * 0.8);
+  TrayMotor.startRotateTo(320, deg);
+  turnLeftWithGyro(85, -185.0 - angleErr, 1450);
+  Move(70, 70);
+  sleep(650);
   Move(-10, -10);
   sleep(100);
   Stop();
-  Tray(100, brake, 500);
-  Tray(50, hold, 1100);
-  Tray(60);
-  sleep(100);
+  Tray(100, coast, 600);
+  Tray(80, coast, 800);
+  Tray(60, coast, 1100);
+  Tray(50);
+  sleep(230);
   Move(30, 30);
   sleep(200);
+  Move(0, 0);
+  sleep(450);
   Tray(0, coast);
-  goBackward(80, -400, 2000);
+  Move(-100, -100);
+  sleep(700);
   goto INTERRUPT;
 INTERRUPT:
   Intake(0);
-  Stop(hold);
+  Stop(brake);
   return;
 }
 
