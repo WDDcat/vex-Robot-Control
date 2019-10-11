@@ -2509,10 +2509,11 @@ Linker script and memory map
                 0x03808677       0xab build/src/activity_motorInfo.o
                                  0xbf (size before relaxing)
  .rodata.str1.1
-                0x03808722       0x44 build/src/activity_robotTest.o
+                0x03808722       0x42 build/src/activity_robotTest.o
                                  0x47 (size before relaxing)
  .rodata.str1.1
-                0x03808766       0x2e C:\Program Files (x86)\VEX Robotics\VEXcode\sdk/vexv5\libv5rt.a(v5_startup.c.obj)
+                0x03808764       0x2e C:\Program Files (x86)\VEX Robotics\VEXcode\sdk/vexv5\libv5rt.a(v5_startup.c.obj)
+ *fill*         0x03808792        0x2 
  .rodata._ZN3vex6PORT22E
                 0x03808794        0x4 C:\Program Files (x86)\VEX Robotics\VEXcode\sdk/vexv5\libv5rt.a(vex_global.cpp.obj)
                 0x03808794                vex::PORT22

@@ -53,7 +53,7 @@ void pre_auton( void ) {
   gyroInit();
   task setGyro(GyroTask);
 
-  activity_loading("7258B", false);
+  activity_loading("7258A", false);
   while(true){
     double cur = GyroGetAngle();
     Brain.Screen.setPenColor(vex::color::cyan);
