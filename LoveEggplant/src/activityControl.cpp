@@ -37,6 +37,18 @@ void activityControl(int selection){
 }
 
 void onClickListener(){
+  if(Controller.ButtonA.pressing() && Controller.ButtonB.pressing() && activity == ACTIVITY_MAIN){
+    activity_main_onClickListener();
+    return;
+  }
+  if(activity == ACTIVITY_AUTOSELECT){
+    if(Controller.ButtonA.pressing() ||
+        Controller.ButtonUp.pressing() ||
+        Controller.ButtonDown.pressing() ||
+        Controller.ButtonLeft.pressing() ||
+        Controller.ButtonRight.pressing())
+      activity_autoSelect_onClickListener();
+  }
   if(Brain.Screen.pressing()){
     switch(activity){
     case ACTIVITY_MAIN:

@@ -256,15 +256,14 @@ INTERRUPT:
   Stop(hold);
   Tray(0, coast);
   return;
- }
+}
 
- void auto5(){
-    while(!LimitBack.pressing()){
-      Tray(-100);
-    }
-    TrayMotor.resetRotation();
-    Tray(-5);
-    sleep(20);
-    Tray(0, hold);
-    Intake(-50);
- }
+void auto5(){
+  // goForward(70, 600, 3000);
+  // Stop(hold);
+  //turnLeftWithGyro(50, -114, 1500, false);
+  // turnRightWithGyro(100, 121, 2500, false);
+  // turnRightWithGyro(60, 46.0, 2000, true);
+  turnLeftWithGyro(85, -185.0, 1450, false);
+  Stop(hold);
+}

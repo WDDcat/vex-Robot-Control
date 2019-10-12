@@ -8,7 +8,7 @@ using namespace std;
 int xStart = 30, yStart = 227, width = 26;
 
 void drawMap();
-void drawStart(int x, int y);
+void drawStart(float x, float y);
 
 void activity_autoSelect(){
   Brain.Screen.clearScreen();
@@ -25,7 +25,7 @@ void activity_autoSelect(){
   }
   else  {
     Brain.Screen.setPenColor(vex::color(0xff0000));
-    Brain.Screen.printAt(10, 60, (blueAuto[auton - 5] + " is selected").c_str());
+    Brain.Screen.printAt(10, 60, (redAuto[auton - 5] + " is selected").c_str());
   }
 
   Brain.Screen.setPenColor(vex::color::blue);
@@ -38,6 +38,21 @@ void activity_autoSelect(){
   Brain.Screen.printAt(SCREEN_MAX_WIDTH / 4 * 3, SCREEN_MAX_HEIGHT / 5 * 2, ("6." + redAuto[1]).c_str());
   Brain.Screen.printAt(SCREEN_MAX_WIDTH / 4 * 3, SCREEN_MAX_HEIGHT / 5 * 3, ("7." + redAuto[2]).c_str());
   Brain.Screen.printAt(SCREEN_MAX_WIDTH / 4 * 3, SCREEN_MAX_HEIGHT / 5 * 4, ("8." + redAuto[3]).c_str());
+
+  Brain.Screen.setPenColor(vex::color(0XFFFF00));
+  switch(auton){
+  case 1: Brain.Screen.printAt(SCREEN_MAX_WIDTH / 2, SCREEN_MAX_HEIGHT / 5, ("1." + blueAuto[0]).c_str());  break;
+  case 2: Brain.Screen.printAt(SCREEN_MAX_WIDTH / 2, SCREEN_MAX_HEIGHT / 5 * 2, ("2." + blueAuto[1]).c_str());  break;
+  case 3: Brain.Screen.printAt(SCREEN_MAX_WIDTH / 2, SCREEN_MAX_HEIGHT / 5 * 3, ("3." + blueAuto[2]).c_str());  break;
+  case 4: Brain.Screen.printAt(SCREEN_MAX_WIDTH / 2, SCREEN_MAX_HEIGHT / 5 * 4, ("4." + blueAuto[3]).c_str());  break;
+  }
+  Brain.Screen.setPenColor(vex::color(0X00FFFF));
+  switch(auton){
+  case 5: Brain.Screen.printAt(SCREEN_MAX_WIDTH / 4 * 3, SCREEN_MAX_HEIGHT / 5, ("5." + redAuto[0]).c_str());  break;
+  case 6: Brain.Screen.printAt(SCREEN_MAX_WIDTH / 4 * 3, SCREEN_MAX_HEIGHT / 5 * 2, ("6." + redAuto[1]).c_str());  break;
+  case 7: Brain.Screen.printAt(SCREEN_MAX_WIDTH / 4 * 3, SCREEN_MAX_HEIGHT / 5 * 3, ("7." + redAuto[2]).c_str());  break;
+  case 8: Brain.Screen.printAt(SCREEN_MAX_WIDTH / 4 * 3, SCREEN_MAX_HEIGHT / 5 * 4, ("8." + redAuto[3]).c_str());  break;
+  }
 
   drawMap();
   drawStart(startPosition[auton - 1][0], startPosition[auton - 1][1]);
@@ -58,6 +73,7 @@ void activity_autoSelect_onClickListener(){
     else if(Brain.Screen.xPosition() >= 240 && Brain.Screen.xPosition() < 360){
       if(Brain.Screen.yPosition() < SCREEN_MAX_HEIGHT / 5){
         if(selection != 1){
+          auton = 1;
           selection = 1;
           activity_autoSelect();
         }
@@ -66,6 +82,7 @@ void activity_autoSelect_onClickListener(){
       }
       else if(Brain.Screen.yPosition() < SCREEN_MAX_HEIGHT / 5 * 2){
         if(selection != 2){
+          auton = 2;
           selection = 2;
           activity_autoSelect();
         }
@@ -74,6 +91,7 @@ void activity_autoSelect_onClickListener(){
       }
       else if(Brain.Screen.yPosition() < SCREEN_MAX_HEIGHT / 5 * 3){
         if(selection != 3){
+          auton = 3;
           selection = 3;
           activity_autoSelect();
         }
@@ -82,6 +100,7 @@ void activity_autoSelect_onClickListener(){
       }
       else if(Brain.Screen.yPosition() < SCREEN_MAX_HEIGHT / 5 * 4){
         if(selection != 4){
+          auton = 4;
           selection = 4;
           activity_autoSelect();
         }
@@ -92,6 +111,7 @@ void activity_autoSelect_onClickListener(){
     else if(Brain.Screen.xPosition() > 360){
       if(Brain.Screen.yPosition() < SCREEN_MAX_HEIGHT / 5){
         if(selection != 5){
+          auton = 5;
           selection = 5;
           activity_autoSelect();
         }
@@ -100,6 +120,7 @@ void activity_autoSelect_onClickListener(){
       }
       else if(Brain.Screen.yPosition() < SCREEN_MAX_HEIGHT / 5 * 2){
         if(selection != 6){
+          auton = 6;
           selection = 6;
           activity_autoSelect();
         }
@@ -108,6 +129,7 @@ void activity_autoSelect_onClickListener(){
       }
       else if(Brain.Screen.yPosition() < SCREEN_MAX_HEIGHT / 5 * 3){
         if(selection != 7){
+          auton = 7;
           selection = 7;
           activity_autoSelect();
         }
@@ -116,6 +138,7 @@ void activity_autoSelect_onClickListener(){
       }
       else if(Brain.Screen.yPosition() < SCREEN_MAX_HEIGHT / 5 * 4){
         if(selection != 8){
+          auton = 8;
           selection = 8;
           activity_autoSelect();
         }
@@ -124,11 +147,38 @@ void activity_autoSelect_onClickListener(){
       }
     }
   }
+
+  if(Controller.ButtonA.pressing()){
+    while(Controller.ButtonA.pressing());
+    selection = -1;
+  }
+  if(Controller.ButtonUp.pressing()){
+    while(Controller.ButtonUp.pressing());
+    if(auton > 1) auton--;
+    else          auton = 1;
+    selection = auton;
+  }
+  if(Controller.ButtonDown.pressing()){
+    while(Controller.ButtonDown.pressing());
+    if(auton < 8) auton++;
+    else          auton = 8;
+    selection = auton;
+  }
+  if(Controller.ButtonLeft.pressing()){
+    while(Controller.ButtonLeft.pressing());
+    if(auton > 4) auton -= 4;
+    selection = auton;
+  }
+  if(Controller.ButtonRight.pressing()){
+    while(Controller.ButtonRight.pressing());
+    if(auton < 5) auton += 4;
+    selection = auton;
+  }
   activity_autoSelect();
   activityControl(selection);
 }
 
-void drawStart(int x, int y){
+void drawStart(float x, float y){
   Brain.Screen.setPenColor(vex::color(0xffffff));
   Brain.Screen.drawCircle(xStart + (x-1) * width + width / 2, yStart - (y-1) * width - width / 2, width * 0.325, vex::color::white);
 }

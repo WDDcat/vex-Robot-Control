@@ -11,7 +11,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <map>
 
 #include "v5.h"
 #include "v5_vcs.h"
@@ -26,11 +25,11 @@
 #define ACTIVITY_ROBOTTEST    0xFB
 
 #define KP 0.7
-#define KI 0.07//0.7
-#define KD 12.0//15.0
-#define KP_TURN 0.51//0.42
-#define KI_TURN 0.003//0.002
-#define KD_TURN 35.0//4.0
+#define KI 0.07       //0.7
+#define KD 12.0       //15.0
+#define KP_TURN 0.51    //0.51  //0.42
+#define KI_TURN 0.003     //0.003 //0.002
+#define KD_TURN 35.0    //35.0  //4.0
 #define KI_START_PERCENT 0.95
 #define KI_TURN_START_PERCENT 0.92
 #define KI_INDEX_PAR (1 - KI_START_PERCENT)
@@ -55,5 +54,3 @@ extern limit LimitFront;
 extern gyro Gyro;
 
 extern int auton;
-
-// std::map<std::string, int> motorPreset;

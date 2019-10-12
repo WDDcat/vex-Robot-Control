@@ -18,7 +18,7 @@ void activity_main(){
   }
   else  {
     Brain.Screen.setPenColor(vex::color(0xff0000));
-    Brain.Screen.printAt(10, 60, (blueAuto[auton - 5] + " is selected").c_str());
+    Brain.Screen.printAt(10, 60, (redAuto[auton - 5] + " is selected").c_str());
   }
 }
 
@@ -57,6 +57,11 @@ void activity_main_onClickListener(){
       Brain.Screen.setPenColor(vex::color::orange);
       Brain.Screen.printAt(SCREEN_MAX_WIDTH / 2, SCREEN_MAX_HEIGHT / 5 * 4, "About");
     }
+  }
+  while(Controller.ButtonA.pressing() && Controller.ButtonB.pressing()){
+    selection = 1;
+    Brain.Screen.setPenColor(vex::color::orange);
+    Brain.Screen.printAt(SCREEN_MAX_WIDTH / 2, SCREEN_MAX_HEIGHT / 5, "Auto Select");
   }
   activity_main();
   activityControl(selection);

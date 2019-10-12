@@ -6,7 +6,6 @@
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-//#include "C:/Program Files (x86)/VEX Robotics/VEXcode/sdk/vexv5/include/vex_units.h"
 #include "vex.h"
 
 #include "screen.h"
@@ -19,22 +18,26 @@ using namespace vex;
 brain Brain;
 controller Controller = controller();
 //PeiLianChe   //12 13 15 14 8 19 9 5 F E C
-motor LeftMotor1  (PORT3,   gearSetting::ratio18_1, false);
-motor LeftMotor2  (PORT15,   gearSetting::ratio18_1, false);
-motor RightMotor1 (PORT7,   gearSetting::ratio18_1, true);
-motor RightMotor2 (PORT6,   gearSetting::ratio18_1, true);
-motor LiftMotor   (PORT4,    gearSetting::ratio18_1, false);
-motor TrayMotor   (PORT10,   gearSetting::ratio18_1, true);
-motor LeftIntake  (PORT11,    gearSetting::ratio18_1, false);
-motor RightIntake (PORT13,    gearSetting::ratio18_1, true);
-limit LimitBack   (Brain.ThreeWirePort.A);
+
+/*WSF*///int motorPreset[8] = {PORT3, PORT15, PORT7, PORT6, PORT4, PORT10, PORT11, PORT13};
+/*DYZ*/int motorPreset[8] = {PORT4, PORT11, PORT10, PORT20, PORT1, PORT3, PORT9, PORT8};
+motor LeftMotor1  (motorPreset[0],   gearSetting::ratio18_1, false);
+motor LeftMotor2  (motorPreset[1],   gearSetting::ratio18_1, false);
+motor RightMotor1 (motorPreset[2],   gearSetting::ratio18_1, true);
+motor RightMotor2 (motorPreset[3],   gearSetting::ratio18_1, true);
+motor LiftMotor   (motorPreset[4],    gearSetting::ratio18_1, false);
+motor TrayMotor   (motorPreset[5],   gearSetting::ratio18_1, true);
+motor LeftIntake  (motorPreset[6],    gearSetting::ratio18_1, false);
+motor RightIntake (motorPreset[7],    gearSetting::ratio18_1, true);
+limit LimitBack   (Brain.ThreeWirePort.D);
 limit LimitFront  (Brain.ThreeWirePort.E);
 gyro Gyro         (Brain.ThreeWirePort.C);
 
 vex::competition Competition;
 
 // define your global instances of motors and other devices here
-int auton = 4;
+int auton = 5;
+bool initComplete = false;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -49,16 +52,18 @@ int auton = 4;
 void pre_auton( void ) {
   LeftIntake.setBrake(coast);
   RightIntake.setBrake(coast);
+  ResetMotor();
   
   gyroInit();
   task setGyro(GyroTask);
+  initComplete = true;
 
   activity_loading("7258A", false);
   while(true){
     double cur = GyroGetAngle();
     Brain.Screen.setPenColor(vex::color::cyan);
-    Brain.Screen.setFont(vex::fontType::mono40);
-    Brain.Screen.printAt(40, 70, "%f", cur);
+    Brain.Screen.setFont(vex::fontType::mono30);
+    Brain.Screen.printAt(360, 23, "%f", cur);
   }
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
@@ -114,6 +119,8 @@ void drivercontrol( void ) {
     BtnL = Controller.ButtonLeft.pressing();
     BtnR = Controller.ButtonRight.pressing();
     intakeMove = true;
+    
+    if(!initComplete) continue;
 
     //Move control
     if(abs(Ch3) > 10 || abs(Ch4) > 10){
@@ -125,14 +132,14 @@ void drivercontrol( void ) {
     }
     else Stop(coast);
 
-    //Tray comtrol
+    //Tray control
     if(Ch2 > 15){
       intakeMove = false;
       if(fabs(TrayMotor.rotation(deg)) < 360){
         Tray(Ch2);
       }
       else{
-        Tray(Ch2 * 0.5);
+        Tray(Ch2 * 0.4);
       }
     }
     else if(Ch2 < -15){
@@ -160,6 +167,7 @@ void drivercontrol( void ) {
     }
 
     onClickListener();
+
     sleep(20); //Sleep the task for a short amount of time to prevent wasted resources. 
   }
 }

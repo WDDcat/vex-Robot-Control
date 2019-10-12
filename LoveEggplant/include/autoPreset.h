@@ -2,24 +2,24 @@
 using namespace std;
 
 const static string blueAuto[4] = {
-  "4 Cube",
-  "7 Cube",
-  "",
-  "",
+  "Bule1",
+  "Blue2",
+  "8 cube√",
+  "7 cube√",
 };
 
 const static string redAuto[4] = {
-  "4 Cube",
+  "Red1",
+  "Red2",
+  "8 Cube",
   "7 Cube",
-  "",
-  "",
 };
 
-const static int startPosition[8][2] = {
+const static float startPosition[8][2] = {
   {1,5},
   {1,4},
-  {-1,-1},
-  {-1,-1},
+  {1,4.5},
+  {1,2.5},
   {6,5},
   {6,4},
   {-1,-1},

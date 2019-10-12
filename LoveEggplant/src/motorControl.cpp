@@ -41,6 +41,10 @@ void gyroInit(){
 }
 
 void ResetMotor(){
+  LeftMotor1.setBrake(coast);
+  LeftMotor2.setBrake(coast);
+  RightMotor1.setBrake(coast);
+  RightMotor2.setBrake(coast);
   LeftMotor1.resetRotation();
   LeftMotor2.resetRotation();
   RightMotor1.resetRotation();
@@ -70,10 +74,10 @@ void Move(float lPower, float rPower){
 }
 
 void sMove(float lPower, float rPower){
-  LeftMotor1.spin(fwd, 2*lPower, rpm);
-  LeftMotor2.spin(fwd, 2*lPower, rpm);
-  RightMotor1.spin(fwd, 2*rPower, rpm);
-  RightMotor2.spin(fwd, 2*rPower, rpm);
+  LeftMotor1.spin(fwd, 2 * lPower, rpm);
+  LeftMotor2.spin(fwd, 2 * lPower, rpm);
+  RightMotor1.spin(fwd, 2 * rPower, rpm);
+  RightMotor2.spin(fwd, 2 * rPower, rpm);
 }
 
 void Stop(brakeType type){
