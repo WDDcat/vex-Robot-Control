@@ -34,7 +34,7 @@ gyro Gyro         (Brain.ThreeWirePort.C);
 vex::competition Competition;
 
 // define your global instances of motors and other devices here
-int auton = 3;
+int auton = 4;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
