@@ -7,7 +7,7 @@ void Lift(int power);
 void Tray(float power, vex::brakeType type = vex::brake, float rotation = 0.0);
 void Intake(float power);
 
-void spread(int target, int timeLimit);
+void spread();
 bool goForward(int power, float target, float timeLimit);
 bool goBackward(int power, float target, float timeLimit);
 bool rushForward(int power, float target, float timeLimit);
@@ -15,5 +15,6 @@ bool rushBackward(int power, float target, float timeLimit);
 bool turnLeft(int power, float target, float timeLimit);
 bool turnRight(int power, float target, float timeLimit);
 void backToWall(float power, int dis1, int dis2, int dis3, int dis4, int time, bool left);
-bool turnLeftWithGyro(int power, float target, float timeLimit, bool fullTime);
-bool turnRightWithGyro(int power, float target, float timeLimit, bool fullTime);
+bool turnLeftWithGyro(int power, float target, float timeLimit, bool fullTime, float P = 0.33, float I = 0.0001, float D = 1.25);
+bool turnRightWithGyro(int power, float target, float timeLimit, bool fullTime, float P = 0.33, float I = 0.0001, float D = 1.25);
+bool turnRightWithGyroL(int power, float target, float timeLimit, bool fullTime, float P = 0.33, float I = 0.0001, float D = 1.25);

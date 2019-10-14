@@ -31,12 +31,13 @@ motor LeftIntake  (motorPreset[6],    gearSetting::ratio18_1, false);
 motor RightIntake (motorPreset[7],    gearSetting::ratio18_1, true);
 limit LimitBack   (Brain.ThreeWirePort.D);
 limit LimitFront  (Brain.ThreeWirePort.E);
+limit LimitDown   (Brain.ThreeWirePort.B);
 gyro Gyro         (Brain.ThreeWirePort.C);
 
 vex::competition Competition;
 
 // define your global instances of motors and other devices here
-int auton = 5;
+int auton = 1;
 bool initComplete = false;
 
 /*---------------------------------------------------------------------------*/
@@ -100,6 +101,7 @@ void drivercontrol( void ) {
   // User control code here, inside the loop
   int Ch1, Ch2, Ch3, Ch4;
   bool L1, L2, R1, R2, BtnA, BtnB, BtnX, BtnY, BtnU, BtnD, BtnL, BtnR;
+  bool LiftLow = false, LiftHigh = false;
   bool intakeMove = true;
   while (1) {
     Ch1 = Controller.Axis1.value();
@@ -157,8 +159,26 @@ void drivercontrol( void ) {
     }
 
     if(L1)      Lift(100);
-    else if(L2) Lift(-100);
-    else        Lift(0);
+    else if(L2){
+      if(LimitDown.pressing()){
+        Lift(0);
+        LiftMotor.resetRotation();
+      }
+      else  Lift(-100);
+    }
+    else{
+      if(BtnA)  {LiftLow = true; LiftHigh = false;}
+      if(BtnX)  {LiftLow = false; LiftHigh = true;}
+      if(LiftLow){
+        if(LiftMotor.rotation(deg) < 700) Lift(100);
+        else {Lift(0); LiftLow = false;}
+      }
+      else if(LiftHigh){
+        if(LiftMotor.rotation(deg) < 1100) Lift(900);
+        else {Lift(0); LiftHigh = false;}
+      }
+      else Lift(0);
+    }
 
     if(intakeMove){
       if(R1)      Intake(100);

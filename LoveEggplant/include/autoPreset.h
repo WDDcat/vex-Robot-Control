@@ -2,16 +2,16 @@
 using namespace std;
 
 const static string blueAuto[4] = {
-  "Bule1",
+  "7 cube Big",
   "Blue2",
-  "8 cube√",
-  "7 cube√",
+  "8 cubewsf",
+  "7 cubewsf",
 };
 
 const static string redAuto[4] = {
-  "Red1",
+  "8 cube√",
   "Red2",
-  "8 Cube",
+  "8 Cube√",
   "7 Cube",
 };
 

@@ -120,25 +120,17 @@ void Intake(float power){
 }
 
 //////////////////////AUTO CONTROL////////////////////////
-void spread(int target, int timeLimit){
+void spread(){
+  Move(-20, -20);
   while(!LimitBack.pressing()){
     Tray(-100);
   }
   TrayMotor.resetRotation();
-  Tray(-5);
-  sleep(20);
-  Tray(0, hold);
-  LeftMotor1.resetRotation();
-  LiftMotor.resetRotation();
-  while(LeftMotor1.rotation(deg) < target){
-    if(LeftMotor1.rotation(deg) < target * 0.6)   Move(70, 70);
-    else                                          Move(40, 40);
-  }
-  Move(-60, -60);
-  sleep(400);
-  Intake(-100);
-  sleep(timeLimit);
+  Tray(-20);
   Intake(100);
+  sleep(100);
+  Tray(0, hold);
+  sleep(250);
 }
 
 bool goForward(int power, float target, float timeLimit){
@@ -268,7 +260,6 @@ bool rushBackward(int power, float target, float timeLimit){
     }
     else  Move(-power, -power);
   }
-  Stop(hold);
   return false;
 }
 
@@ -437,7 +428,7 @@ bool turnRight(int power, float target, float timeLimit){
   return false;
 }
 
-bool turnLeftWithGyro(int power, float target, float timeLimit, bool fullTime){
+bool turnLeftWithGyro(int power, float target, float timeLimit, bool fullTime, float P, float I, float D){
   ResetMotor();
   float cur = GyroGetAngle();
   float err = target - cur, last_err = 0, total_err = 0, delta_err = 0, OUT;
@@ -454,7 +445,7 @@ bool turnLeftWithGyro(int power, float target, float timeLimit, bool fullTime){
       else if(err <= 0.6) return true;
     }
 
-    OUT = KP_TURN * err + KI_TURN * total_err + KD_TURN * delta_err;
+    OUT = P * err + I * total_err + D * delta_err;
     if(fabs(OUT) < power * 0.1){
       if(OUT > 0) OUT = power * 0.1;
       else        OUT = -(power * 0.1);
@@ -469,7 +460,7 @@ bool turnLeftWithGyro(int power, float target, float timeLimit, bool fullTime){
   return false;
 }
 
-bool turnRightWithGyro(int power, float target, float timeLimit, bool fullTime){
+bool turnRightWithGyro(int power, float target, float timeLimit, bool fullTime, float P, float I, float D){
   ResetMotor();
   float cur = GyroGetAngle();
   float err = target - cur, last_err = 0, total_err = 0, delta_err = 0, OUT;
@@ -486,7 +477,7 @@ bool turnRightWithGyro(int power, float target, float timeLimit, bool fullTime){
       else if(err >= -0.6)  return true;
     }
 
-    OUT = KP_TURN * err + KI_TURN * total_err + KD_TURN * delta_err;
+    OUT = P * err + I * total_err + D * delta_err;
     if(fabs(OUT) < power * 0.1){
       if(OUT > 0) OUT = power * 0.1;
       else        OUT = -(power * 0.1);
@@ -494,6 +485,41 @@ bool turnRightWithGyro(int power, float target, float timeLimit, bool fullTime){
 
     sMove(CONSTRAIN(OUT, -power, power),
           CONSTRAIN(-OUT, -power, power));
+
+    sleep(10);
+  }
+  Stop(hold);
+  return false;
+}
+
+bool turnRightWithGyroL(int power, float target, float timeLimit, bool fullTime, float P, float I, float D){
+  ResetMotor();
+  float cur = GyroGetAngle();
+  float err = target - cur, last_err = 0, total_err = 0, delta_err = 0, OUT;
+  Brain.resetTimer();
+  while (Brain.timer(msec) < timeLimit) {
+    cur = GyroGetAngle();
+    last_err = err;
+    err = target - cur;
+    if(cur / target > KI_TURN_START_PERCENT)
+      total_err += err;
+    delta_err = err - last_err;
+    if(err <= 0.6) {
+      if(!fullTime) return true;
+      else if(err >= -0.6)  return true;
+    }
+
+    OUT = P * err + I * total_err + D * delta_err;
+    if(fabs(OUT) < power * 0.1){
+      if(OUT > 0) OUT = power * 0.1;
+      else        OUT = -(power * 0.1);
+    }
+
+    
+    LeftMotor1.spin(fwd, 3 * OUT, rpm);
+    LeftMotor2.spin(fwd, 3 * OUT, rpm);
+    RightMotor1.stop(hold);
+    RightMotor2.stop(hold);
 
     sleep(10);
   }
