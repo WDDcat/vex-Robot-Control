@@ -526,3 +526,38 @@ bool turnRightWithGyroL(int power, float target, float timeLimit, bool fullTime,
   Stop(hold);
   return false;
 }
+
+bool turnLeftWithGyroR(int power, float target, float timeLimit, bool fullTime, float P, float I, float D){
+  ResetMotor();
+  float cur = GyroGetAngle();
+  float err = target - cur, last_err = 0, total_err = 0, delta_err = 0, OUT;
+  Brain.resetTimer();
+  while (Brain.timer(msec) < timeLimit) {
+    cur = GyroGetAngle();
+    last_err = err;
+    err = target - cur;
+    if(cur / target > KI_TURN_START_PERCENT)
+      total_err += err;
+    delta_err = err - last_err;
+    if(err <= 0.6) {
+      if(!fullTime) return true;
+      else if(err >= -0.6)  return true;
+    }
+
+    OUT = P * err + I * total_err + D * delta_err;
+    if(fabs(OUT) < power * 0.1){
+      if(OUT > 0) OUT = power * 0.1;
+      else        OUT = -(power * 0.1);
+    }
+
+    
+    RightMotor1.spin(fwd, -(3 * OUT), rpm);
+    RightMotor2.spin(fwd, -(3 * OUT), rpm);
+    LeftMotor1.stop(hold);
+    LeftMotor2.stop(hold);
+
+    sleep(10);
+  }
+  Stop(hold);
+  return false;
+}

@@ -18,3 +18,4 @@ void backToWall(float power, int dis1, int dis2, int dis3, int dis4, int time, b
 bool turnLeftWithGyro(int power, float target, float timeLimit, bool fullTime, float P = 0.33, float I = 0.0001, float D = 1.25);
 bool turnRightWithGyro(int power, float target, float timeLimit, bool fullTime, float P = 0.33, float I = 0.0001, float D = 1.25);
 bool turnRightWithGyroL(int power, float target, float timeLimit, bool fullTime, float P = 0.33, float I = 0.0001, float D = 1.25);
+bool turnLeftWithGyroR(int power, float target, float timeLimit, bool fullTime, float P = 0.33, float I = 0.0001, float D = 1.25);

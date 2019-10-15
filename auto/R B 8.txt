@@ -1,0 +1,45 @@
+spread();
+  if(!rushForward(50, 630, 2000)) goto STOP;
+  turnLeftWithGyroR(40, -32.5, 1000, true, 0.6, 0.0, 1);
+  Intake(50);
+  if(!rushForward(60, 370, 2000)) goto STOP;
+  Stop(brake);
+  sleep(100);
+  Intake(100);
+  if(!rushForward(40, 320, 1800)) goto STOP;
+  Stop(hold);
+  turnLeftWithGyro(70, -235.5, 1700, true, 0.33, 0.00001, 1.25);
+  if(!rushForward(40, 700, 2500)) goto STOP;
+  turnRightWithGyro(40, -119, 1400, true, 0.35, 0.0, 1.5);
+  rushForward(50, 670, 1900);
+  turnLeftWithGyro(60, -174.3, 1500, false);
+  Intake(0);
+  TrayMotor.startRotateTo(240, deg);
+  Move(40, 40);
+  sleep(400);
+  Move(-10, -10);
+  sleep(100);
+  Move(9, 9);
+  sleep(500);
+  Stop();
+  Tray(100, coast, 600);
+  Tray(80, coast, 800);
+  Tray(60, coast, 1100);
+  Tray(50);
+  sleep(200);
+  Move(30, 30);
+  sleep(50);
+  Move(0, 0);
+  sleep(100);
+  Tray(0, coast);
+  Move(-100, -100);
+  // while(timer1.time(msec) < 15000){
+    // Move(-100, -100);
+  // }
+  sleep(700);
+  goto STOP;
+STOP:
+  Intake(0);
+  Stop(hold);
+  Tray(0, coast);
+  return;

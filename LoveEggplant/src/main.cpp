@@ -138,7 +138,7 @@ void drivercontrol( void ) {
     if(Ch2 > 15){
       intakeMove = false;
       if(fabs(TrayMotor.rotation(deg)) < 360){
-        Tray(Ch2);
+        Tray(Ch2 * 1.1);
       }
       else{
         Tray(Ch2 * 0.4);
@@ -174,7 +174,7 @@ void drivercontrol( void ) {
         else {Lift(0); LiftLow = false;}
       }
       else if(LiftHigh){
-        if(LiftMotor.rotation(deg) < 1100) Lift(900);
+        if(LiftMotor.rotation(deg) < 1100) Lift(100);
         else {Lift(0); LiftHigh = false;}
       }
       else Lift(0);

@@ -1,0 +1,76 @@
+timer timer1;
+  timer1.clear();
+  spread();
+  float angleErr = 0.0;
+  spread();
+  RightMotor1.resetRotation();
+  while(RightMotor1.rotation(deg) < 150){
+    Move(200 - RightMotor1.rotation(deg), 200 - RightMotor1.rotation(deg));
+  }
+  Lift(-3);
+  if(!goForward(35, 790, 2300)) goto STOP;
+  Lift(0);
+  Stop(hold);
+  angleErr += GyroGetAngle();
+  turnLeftWithGyro(60, -46.5, 850, true, 0.33, 0.00001, 1.1);
+  Stop(hold);
+  sleep(100);
+  LeftMotor1.resetRotation();
+  while(LeftMotor1.rotation(deg) > -700){//500
+    Move(-100, -100);
+  }
+  Move(-30, -75);
+  sleep(600);
+  Move(-20, -20);
+  sleep(150);
+  Stop();
+  RightMotor1.resetRotation();
+  while(RightMotor1.rotation(deg) < 150){
+    float speed = 180 - LeftMotor1.rotation(deg);
+    Move(CONSTRAIN(speed, 42, 90), CONSTRAIN(speed, 42, 90));
+  }
+  Lift(-5);
+  if(!goForward(30, 950, 4500))  goto STOP;
+  Lift(0);
+  Stop(hold);
+  angleErr += GyroGetAngle();
+  sleep(90);
+  if(GyroGetAbsAngle() > 10){
+    if(GyroGetAngle() > 0)  turnLeftWithGyro(60, 0, 500, true);
+    else                    turnRightWithGyro(60, 0, 500 ,true);
+  }
+  if(!goBackward(100, -370, 2500)) goto STOP;
+  Intake(-20);
+  turnRightWithGyro(85, 174.3 - angleErr, 1500, false, 0.33, 0.00001, 1.25);
+  Stop(hold);
+  Intake(0);
+  TrayMotor.startRotateTo(320, deg);
+  Move(60, 60);
+  sleep(670);
+  Move(70, 0);
+  sleep(50);
+  Move(0, 70);
+  sleep(50);
+  Move(-10, -10);
+  sleep(100);
+  Stop();
+  Tray(70, coast, 600);
+  Intake(-10);
+  Tray(60, coast, 800);
+  Intake(0);
+  Tray(50, coast, 1060);
+  Tray(30);
+  Move(30, 30);
+  sleep(150);
+  Move(0, 0);
+  sleep(450);
+  Tray(0, coast);
+  Move(-100, -100);
+  sleep(700);
+  while(timer1.time(msec) < 16500);
+  goto STOP;
+STOP:
+  Stop(hold);
+  Lift(0);
+  Intake(0);
+  Tray(0, hold);

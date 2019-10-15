@@ -5,3 +5,5 @@ void auto3();
 void auto4();
 void auto5();
 void auto6();
+void auto7();
+void auto8();
