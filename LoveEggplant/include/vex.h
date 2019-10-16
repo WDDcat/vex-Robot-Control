@@ -25,11 +25,11 @@
 #define ACTIVITY_ROBOTTEST    0xFB
 
 #define KP 0.6
-#define KI 0.07       //0.7
-#define KD 4.0       //15.0
+#define KI 0.07         //0.7
+#define KD 4.0          //15.0
 #define KP_TURN 0.33    //0.51  //0.42
-#define KI_TURN 0.000   //0.002 //0.003 //0.002
-#define KD_TURN 1.25     //42.0  //35.0  //4.0
+#define KI_TURN 0.000   //0.002 //0.003
+#define KD_TURN 1.25    //42.0  //35.0
 #define KI_START_PERCENT 0.95
 #define KI_TURN_START_PERCENT 0.92
 #define KI_INDEX_PAR (1 - KI_START_PERCENT)

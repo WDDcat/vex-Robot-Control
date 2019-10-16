@@ -13,18 +13,6 @@
 #include "auto.h"
 #include "GyroLib.h"
 
-#ifndef activity_loading
-#define activity_loading(a, b) \
-          Brain.Screen.printAt(4, 41, "7");   \
-          Brain.Screen.printAt(36, 41, "2");  \
-          Brain.Screen.printAt(68, 41, "5");  \
-          Brain.Screen.printAt(100, 41, "8");
-#endif
-
-#ifndef onClickListener
-#define onClickListener() sleep(0);
-#endif
-
 using namespace vex;
 
 brain Brain;
@@ -33,12 +21,12 @@ controller Controller = controller();
 
 /*WSF*///int motorPreset[8] = {PORT3, PORT15, PORT7, PORT6, PORT4, PORT10, PORT11, PORT14};
 /*DYZ*/int motorPreset[8] = {PORT4, PORT11, PORT10, PORT20, PORT1, PORT3, PORT9, PORT8};
-motor LeftMotor1  (motorPreset[0],   gearSetting::ratio18_1, false);
-motor LeftMotor2  (motorPreset[1],   gearSetting::ratio18_1, false);
-motor RightMotor1 (motorPreset[2],   gearSetting::ratio18_1, true);
-motor RightMotor2 (motorPreset[3],   gearSetting::ratio18_1, true);
+motor LeftMotor1  (motorPreset[0],    gearSetting::ratio18_1, false);
+motor LeftMotor2  (motorPreset[1],    gearSetting::ratio18_1, false);
+motor RightMotor1 (motorPreset[2],    gearSetting::ratio18_1, true);
+motor RightMotor2 (motorPreset[3],    gearSetting::ratio18_1, true);
 motor LiftMotor   (motorPreset[4],    gearSetting::ratio18_1, false);
-motor TrayMotor   (motorPreset[5],   gearSetting::ratio18_1, true);
+motor TrayMotor   (motorPreset[5],    gearSetting::ratio18_1, true);
 motor LeftIntake  (motorPreset[6],    gearSetting::ratio18_1, false);
 motor RightIntake (motorPreset[7],    gearSetting::ratio18_1, true);
 limit LimitBack   (Brain.ThreeWirePort.D);
@@ -49,7 +37,7 @@ gyro Gyro         (Brain.ThreeWirePort.C);
 vex::competition Competition;
 
 // define your global instances of motors and other devices here
-int auton = 2;
+int auton = 5;
 bool initComplete = false;
 
 /*---------------------------------------------------------------------------*/
@@ -77,6 +65,7 @@ void pre_auton( void ) {
     Brain.Screen.setPenColor(vex::color::cyan);
     Brain.Screen.setFont(vex::fontType::mono30);
     Brain.Screen.printAt(360, 23, "%f", cur);
+    onClickListener();
   }
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
@@ -113,7 +102,7 @@ void drivercontrol( void ) {
   // User control code here, inside the loop
   int Ch1, Ch2, Ch3, Ch4;
   bool L1, L2, R1, R2, BtnA, BtnB, BtnX, BtnY, BtnU, BtnD, BtnL, BtnR;
-  bool LiftLow = false, LiftHigh = false, LiftDown = true;
+  bool LiftDown = true;
   bool intakeMove = true;
   while (1) {
     Ch1 = Controller.Axis1.value();
@@ -150,7 +139,7 @@ void drivercontrol( void ) {
     if(Ch2 > 15){
       intakeMove = false;
       if(fabs(TrayMotor.rotation(deg)) < 360){
-        Tray(Ch2 * 1.1);
+        Tray(Ch2 * 1.3);
       }
       else{
         Tray(Ch2 * 0.4);
@@ -183,20 +172,20 @@ void drivercontrol( void ) {
       else  Lift(-100);
     }
     else{
-      if(BtnB)  {LiftLow = true; LiftHigh = false;}
-      if(BtnX)  {LiftLow = false; LiftHigh = true;}
-      if(LiftLow){
-        if(LiftMotor.rotation(deg) < 700) Lift(100);
-        else {Lift(0); LiftLow = false;}
-      }
-      else if(LiftHigh){
-        if(LiftMotor.rotation(deg) < 1100) Lift(100);
-        else {Lift(0); LiftHigh = false;}
-      }
-      else{
+      // if(BtnB)  {LiftLow = true; LiftHigh = false;}
+      // if(BtnX)  {LiftLow = false; LiftHigh = true;}
+      // if(LiftLow){
+      //   if(LiftMotor.rotation(deg) < 700) Lift(100);
+      //   else {Lift(0); LiftLow = false;}
+      // }
+      // else if(LiftHigh){
+      //   if(LiftMotor.rotation(deg) < 1100) Lift(100);
+      //   else {Lift(0); LiftHigh = false;}
+      // }
+      // else{
         if(LiftDown && !LimitDown.pressing()) Lift(-10); 
         else  Lift(0);
-      }
+      // }
     }
 
     if(intakeMove){ 

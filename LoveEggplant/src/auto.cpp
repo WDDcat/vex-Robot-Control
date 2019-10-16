@@ -21,9 +21,9 @@ void runAuto(){
   case 6:
     auto6();  break;
   case 7:
-    auto7(); break;
+    auto7();  break;
   case 8:
-    auto8(); break;
+    auto8();  break;
   default:
     break;
   }
@@ -31,15 +31,16 @@ void runAuto(){
 }
 
 void auto1(){
-  timer autoTimer;
-  autoTimer.clear();
   spread();
+  sleep(200);
+  Lift(-15);
   LeftMotor1.resetRotation();
   while(LeftMotor1.rotation(deg) < 150){
     Move(200 - LeftMotor1.rotation(deg), 200 - LeftMotor1.rotation(deg));
   }
-  if(!goForward(38, 790, 2700)) goto STOP;
+  if(!goForward(40, 790, 2700)) goto STOP;
   Stop(hold);
+  Lift(0);
   sleep(650);
   turnRightWithGyro(60, 47.7, 870, true, 0.33, 0.00001, 1.1);
   Stop(hold);
@@ -50,6 +51,7 @@ void auto1(){
   Move(-20, -20);
   sleep(410);
   Stop();
+  Lift(-10);
   LeftMotor1.resetRotation();
   while(LeftMotor1.rotation(deg) < 150){
     float speed = 180 - LeftMotor1.rotation(deg);
@@ -57,6 +59,7 @@ void auto1(){
   }
   if(!goForward(27, 870, 4400))  goto STOP;
   Stop(hold);
+  Lift(0);
   sleep(500);
   if(GyroGetAbsAngle() > 10){
     if(GyroGetAngle() > 0)  turnRightWithGyro(60, 0, 500, false);
@@ -66,9 +69,9 @@ void auto1(){
   if(!goBackward(100, -350, 2000)) goto STOP;
   Intake(0);
   TrayMotor.startRotateTo(320, deg);
-  turnLeftWithGyro(85, -187.0, 1550, false);
+  turnLeftWithGyro(85, -171.0, 1550, false);
   Move(70, 70);
-  sleep(650);
+  sleep(580);
   Move(-10, -10);
   sleep(100);
   Stop();
@@ -80,13 +83,10 @@ void auto1(){
   Move(30, 30);
   sleep(200);
   Move(0, 0);
-  sleep(450);
+  sleep(250);
   Tray(0, coast);
-  while(autoTimer.time(msec) < 15000){
-    Move(-100, -100);
-  }
-  // Move(-100, -100);
-  // sleep(700);
+  Move(-100, -100);
+  sleep(700);
   Stop(coast);
 STOP:
   Intake(0);
@@ -153,22 +153,26 @@ void auto4(){
 
 void auto5(){
   spread();
+  sleep(200);
+  Lift(-15);
   LeftMotor1.resetRotation();
   while(LeftMotor1.rotation(deg) < 150){
     Move(200 - LeftMotor1.rotation(deg), 200 - LeftMotor1.rotation(deg));
   }
-  if(!goForward(38, 790, 2700)) goto STOP;
+  if(!goForward(40, 790, 2700)) goto STOP;
   Stop(hold);
+  Lift(0);
   sleep(650);
   turnLeftWithGyro(60, -47.7, 870, true, 0.33, 0.00001, 1.1);
   Stop(hold);
   sleep(100);
   if(!rushBackward(100, -700, 3000))  goto STOP;
-  Move(-45, -30);
+  Move(-30, -45);
   sleep(760);
   Move(-20, -20);
   sleep(410);
   Stop();
+  Lift(-10);
   LeftMotor1.resetRotation();
   while(LeftMotor1.rotation(deg) < 150){
     float speed = 180 - LeftMotor1.rotation(deg);
@@ -176,6 +180,7 @@ void auto5(){
   }
   if(!goForward(27, 870, 4400))  goto STOP;
   Stop(hold);
+  Lift(0);
   sleep(500);
   if(GyroGetAbsAngle() > 10){
     if(GyroGetAngle() > 0)  turnRightWithGyro(60, 0, 500, false);
@@ -185,9 +190,9 @@ void auto5(){
   if(!goBackward(100, -350, 2000)) goto STOP;
   Intake(0);
   TrayMotor.startRotateTo(320, deg);
-  turnRightWithGyro(85, 187.0, 1550, false);
+  turnRightWithGyro(85, 171.0, 1550, false);
   Move(70, 70);
-  sleep(650);
+  sleep(580);
   Move(-10, -10);
   sleep(100);
   Stop();
@@ -199,7 +204,7 @@ void auto5(){
   Move(30, 30);
   sleep(200);
   Move(0, 0);
-  sleep(450);
+  sleep(250);
   Tray(0, coast);
   Move(-50, -50);
   sleep(500);

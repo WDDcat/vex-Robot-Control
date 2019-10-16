@@ -121,13 +121,13 @@ void Intake(float power){
 
 //////////////////////AUTO CONTROL////////////////////////
 void spread(){
+  Intake(100);
   Move(-20, -20);
   while(!LimitBack.pressing()){
     Tray(-100);
   }
   TrayMotor.resetRotation();
   Tray(-20);
-  Intake(100);
   sleep(100);
   Tray(0, hold);
   sleep(250);
