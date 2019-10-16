@@ -13,13 +13,25 @@
 #include "auto.h"
 #include "GyroLib.h"
 
+#ifndef activity_loading
+#define activity_loading(a, b) \
+          Brain.Screen.printAt(4, 41, "7");   \
+          Brain.Screen.printAt(36, 41, "2");  \
+          Brain.Screen.printAt(68, 41, "5");  \
+          Brain.Screen.printAt(100, 41, "8");
+#endif
+
+#ifndef onClickListener
+#define onClickListener() sleep(0);
+#endif
+
 using namespace vex;
 
 brain Brain;
 controller Controller = controller();
 //PeiLianChe   //12 13 15 14 8 19 9 5 F E C
 
-/*WSF*///int motorPreset[8] = {PORT3, PORT15, PORT7, PORT6, PORT4, PORT10, PORT11, PORT13};
+/*WSF*///int motorPreset[8] = {PORT3, PORT15, PORT7, PORT6, PORT4, PORT10, PORT11, PORT14};
 /*DYZ*/int motorPreset[8] = {PORT4, PORT11, PORT10, PORT20, PORT1, PORT3, PORT9, PORT8};
 motor LeftMotor1  (motorPreset[0],   gearSetting::ratio18_1, false);
 motor LeftMotor2  (motorPreset[1],   gearSetting::ratio18_1, false);
@@ -30,7 +42,7 @@ motor TrayMotor   (motorPreset[5],   gearSetting::ratio18_1, true);
 motor LeftIntake  (motorPreset[6],    gearSetting::ratio18_1, false);
 motor RightIntake (motorPreset[7],    gearSetting::ratio18_1, true);
 limit LimitBack   (Brain.ThreeWirePort.D);
-limit LimitFront  (Brain.ThreeWirePort.E);
+// limit LimitFront  (Brain.ThreeWirePort.E);
 limit LimitDown   (Brain.ThreeWirePort.B);
 gyro Gyro         (Brain.ThreeWirePort.C);
 
@@ -101,7 +113,7 @@ void drivercontrol( void ) {
   // User control code here, inside the loop
   int Ch1, Ch2, Ch3, Ch4;
   bool L1, L2, R1, R2, BtnA, BtnB, BtnX, BtnY, BtnU, BtnD, BtnL, BtnR;
-  bool LiftLow = false, LiftHigh = false;
+  bool LiftLow = false, LiftHigh = false, LiftDown = true;
   bool intakeMove = true;
   while (1) {
     Ch1 = Controller.Axis1.value();
@@ -158,9 +170,13 @@ void drivercontrol( void ) {
       else  Tray(0, brake);
     }
 
-    if(L1)      Lift(100);
+    if(L1){
+      Lift(100);
+      LiftDown = false;
+    }
     else if(L2){
       if(LimitDown.pressing()){
+        LiftDown = true;
         Lift(0);
         LiftMotor.resetRotation();
       }
@@ -177,7 +193,10 @@ void drivercontrol( void ) {
         if(LiftMotor.rotation(deg) < 1100) Lift(100);
         else {Lift(0); LiftHigh = false;}
       }
-      else Lift(0);
+      else{
+        if(LiftDown && !LimitDown.pressing()) Lift(-10); 
+        else  Lift(0);
+      }
     }
 
     if(intakeMove){ 
