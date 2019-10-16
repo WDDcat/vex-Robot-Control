@@ -99,12 +99,14 @@ void auto2(){
   if(!rushForward(50, 630, 2000)) goto STOP;
   turnRightWithGyroL(40, 32.5, 1000, true, 0.6, 0.0, 1);
   Intake(50);
-  if(!rushForward(60, 200, 2000)) goto STOP;
+  if(!rushForward(60, 240, 2000)) goto STOP;
   if(!rushForward(26, 270, 2500)) goto STOP;
-  Intake(100);
-  if(!rushForward(26, 200, 2500)) goto STOP;
+  Intake(70);
+  if(!rushForward(26, 160, 2500)) goto STOP;
   Stop(hold);
+  Intake(100);
   turnRightWithGyro(70, 235.5, 1700, true, 0.33, 0.00001, 1.25);
+  goto STOP;
   if(!rushForward(40, 700, 2500)) goto STOP;
   turnLeftWithGyro(40, 117, 1400, true, 0.34, 0.0001, 1.7);
   rushForward(50, 670, 1900);

@@ -37,7 +37,7 @@ gyro Gyro         (Brain.ThreeWirePort.C);
 vex::competition Competition;
 
 // define your global instances of motors and other devices here
-int auton = 1;
+int auton = 2;
 bool initComplete = false;
 
 /*---------------------------------------------------------------------------*/
@@ -167,7 +167,7 @@ void drivercontrol( void ) {
       else  Lift(-100);
     }
     else{
-      if(BtnA)  {LiftLow = true; LiftHigh = false;}
+      if(BtnB)  {LiftLow = true; LiftHigh = false;}
       if(BtnX)  {LiftLow = false; LiftHigh = true;}
       if(LiftLow){
         if(LiftMotor.rotation(deg) < 700) Lift(100);
@@ -180,7 +180,7 @@ void drivercontrol( void ) {
       else Lift(0);
     }
 
-    if(intakeMove){
+    if(intakeMove){ 
       if(R1)      Intake(100);
       else if(R2) Intake(-100);
       else        Intake(1);
