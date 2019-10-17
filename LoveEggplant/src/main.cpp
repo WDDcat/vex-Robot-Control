@@ -37,7 +37,7 @@ gyro Gyro         (Brain.ThreeWirePort.C);
 vex::competition Competition;
 
 // define your global instances of motors and other devices here
-int auton = 5;
+int auton = 1;
 bool initComplete = false;
 
 /*---------------------------------------------------------------------------*/
@@ -103,7 +103,6 @@ void drivercontrol( void ) {
   int Ch1, Ch2, Ch3, Ch4;
   bool L1, L2, R1, R2, BtnA, BtnB, BtnX, BtnY, BtnU, BtnD, BtnL, BtnR;
   bool LiftDown = true;
-  bool intakeMove = true;
   while (1) {
     Ch1 = Controller.Axis1.value();
     Ch2 = Controller.Axis2.value();
@@ -121,7 +120,6 @@ void drivercontrol( void ) {
     BtnD = Controller.ButtonDown.pressing();
     BtnL = Controller.ButtonLeft.pressing();
     BtnR = Controller.ButtonRight.pressing();
-    intakeMove = true;
     
     if(!initComplete) continue;
 
@@ -137,12 +135,12 @@ void drivercontrol( void ) {
 
     //Tray control
     if(Ch2 > 15){
-      intakeMove = false;
-      if(fabs(TrayMotor.rotation(deg)) < 360){
-        Tray(Ch2 * 1.3);
+      R1 = false;
+      if(fabs(TrayMotor.rotation(deg)) < 360){//360
+        Tray(Ch2*0.6);//0.6
       }
       else{
-        Tray(Ch2 * 0.4);
+        Tray(Ch2 * 0.3);//0.3
       }
     }
     else if(Ch2 < -15){
@@ -188,11 +186,9 @@ void drivercontrol( void ) {
       // }
     }
 
-    if(intakeMove){ 
-      if(R1)      Intake(100);
-      else if(R2) Intake(-100);
-      else        Intake(1);
-    }
+    if(R1)      Intake(100);
+    else if(R2) Intake(-100);
+    else        Intake(1);
 
     onClickListener();
 

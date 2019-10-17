@@ -121,7 +121,9 @@ void Intake(float power){
 
 //////////////////////AUTO CONTROL////////////////////////
 void spread(){
-  Intake(100);
+  Intake(50);
+  sleep(200);
+  Intake(0);
   Move(-20, -20);
   while(!LimitBack.pressing()){
     Tray(-100);
@@ -130,7 +132,8 @@ void spread(){
   Tray(-20);
   sleep(100);
   Tray(0, hold);
-  sleep(250);
+  Intake(100);
+  sleep(100);
 }
 
 bool goForward(int power, float target, float timeLimit){
