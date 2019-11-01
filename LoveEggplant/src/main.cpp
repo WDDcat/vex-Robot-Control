@@ -19,8 +19,8 @@ brain Brain;
 controller Controller = controller();
 //PeiLianChe   //12 13 15 14 8 19 9 5 F E C
 
-/*WSF*///int motorPreset[8] = {PORT3, PORT15, PORT7, PORT6, PORT4, PORT10, PORT11, PORT14};
-/*DYZ*/int motorPreset[8] = {PORT4, PORT11, PORT10, PORT20, PORT1, PORT3, PORT9, PORT8};
+/*WSF*//*AEFCH*/int motorPreset[8] = {PORT3, PORT15, PORT7, PORT6, PORT4, PORT10, PORT11, PORT14};
+/*DYZ*//*DEBCH*///int motorPreset[8] = {PORT4, PORT11, PORT10, PORT20, PORT1, PORT3, PORT9, PORT8};
 motor LeftMotor1  (motorPreset[0],    gearSetting::ratio18_1, false);
 motor LeftMotor2  (motorPreset[1],    gearSetting::ratio18_1, false);
 motor RightMotor1 (motorPreset[2],    gearSetting::ratio18_1, true);
@@ -29,15 +29,18 @@ motor LiftMotor   (motorPreset[4],    gearSetting::ratio18_1, false);
 motor TrayMotor   (motorPreset[5],    gearSetting::ratio18_1, true);
 motor LeftIntake  (motorPreset[6],    gearSetting::ratio18_1, false);
 motor RightIntake (motorPreset[7],    gearSetting::ratio18_1, true);
-limit LimitBack   (Brain.ThreeWirePort.D);
+limit LimitBack   (Brain.ThreeWirePort.A);
 // limit LimitFront  (Brain.ThreeWirePort.E);
-limit LimitDown   (Brain.ThreeWirePort.B);
+limit LimitDown   (Brain.ThreeWirePort.F);
 gyro Gyro         (Brain.ThreeWirePort.C);
+line Line         (Brain.ThreeWirePort.H);
 
 vex::competition Competition;
 
 // define your global instances of motors and other devices here
-int auton = 1;
+int auton = -1;
+double Ldeg = 0.0;
+double Rdeg = 0.0;
 bool initComplete = false;
 
 /*---------------------------------------------------------------------------*/
@@ -55,16 +58,19 @@ void pre_auton( void ) {
   RightIntake.setBrake(coast);
   ResetMotor();
   
-  gyroInit();
-  task setGyro(GyroTask);
-  initComplete = true;
+  // gyroInit();
+  // task setGyro(GyroTask);
+  // initComplete = true;
 
   activity_loading("7258A", false);
   while(true){
-    double cur = GyroGetAngle();
+    //double cur = GyroGetAngle();
+    double cur = LeftMotor2.rotation(deg) - Ldeg;
+    double cur2 = RightMotor2.rotation(deg) - Rdeg;
     Brain.Screen.setPenColor(vex::color::cyan);
     Brain.Screen.setFont(vex::fontType::mono30);
     Brain.Screen.printAt(360, 23, "%f", cur);
+    Brain.Screen.printAt(360, 48, "%f", cur2);
     onClickListener();
   }
   // All activities that occur before the competition starts
@@ -186,8 +192,10 @@ void drivercontrol( void ) {
       // }
     }
 
-    if(R1)      Intake(100);
-    else if(R2) Intake(-100);
+
+    if(BtnA && Line.value(pct) > 10)      Intake(100);
+    else if(R1) Intake(100);
+    else if(R2) Intake(-35);
     else        Intake(1);
 
     onClickListener();

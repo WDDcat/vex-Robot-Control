@@ -1,4 +1,5 @@
 void runAuto();
+void autoTest();
 void auto1();
 void auto2();
 void auto3();

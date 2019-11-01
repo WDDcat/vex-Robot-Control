@@ -6,8 +6,10 @@
 extern int auton;
 
 void runAuto(){
-  while (!GyroGetValid()) sleep(10);
+  // while (!GyroGetValid()) sleep(10);
   switch(auton){
+  case -1:
+    autoTest(); break;
   case 1:
     auto1();  break;
   case 2:
@@ -150,8 +152,54 @@ STOP:
   return;
 }
 
-void auto3(){
-  
+void auto3(){ // blue big 7
+  spread();
+  Intake(0);
+  if(!rushForward(50, 630, 2000)) goto STOP;
+  turnRightWithGyroL(40, 30.2, 1000, true, 0.6, 0.0, 1);
+  Intake(45);
+  Lift(-5);
+  if(!rushForward(15, 275, 3300)) goto STOP;
+  Intake(100);
+  if(!rushForward(40, 380, 2500)) goto STOP;
+  Stop(hold);
+  turnRightWithGyro(70, 235.5, 1800, true, 0.33, 0.00001, 1.25);
+  Lift(0);
+  if(!rushForward(50, 700, 2500)) goto STOP;
+  Stop(hold);
+  sleep(250);
+  turnLeftWithGyro(40, 156, 1500, false, 0.34, 0.0001, 1.7);
+  rushForward(60, 550, 1900);
+  Stop(hold);
+  // sleep(100);
+  // turnRightWithGyro(62, 165.3, 1200, false);
+  Intake(0);
+  TrayMotor.startRotateTo(240, deg);
+  Move(10, 40);
+  sleep(800);
+  Move(-10, -10);
+  sleep(100);
+  Move(5, 5);
+  sleep(500);
+  Stop();
+  Tray(60, coast, 800);
+  Tray(40, coast, 1100);
+  Tray(20);
+  sleep(350);
+  Tray(0);
+  Move(30, 30);
+  sleep(100);
+  Move(0, 0);
+  sleep(200);
+  Tray(0, coast);
+  Move(-70, -70);
+  sleep(700);
+  goto STOP;
+STOP:
+  Intake(0);
+  Stop(coast);
+  Tray(0, coast);
+  return;
 }
 
 void auto4(){
@@ -278,4 +326,20 @@ void auto7(){
 
 void auto8(){
   
+}
+
+void autoTest(){
+  Intake(30);
+  // spread();
+  // Lift(-15);
+  // goForward(27, 820, 9900);
+  // Lift(0);
+  // Stop(hold);
+  sleep(9000000000000000000);
+  goto STOP;
+STOP:
+  Intake(0);
+  Stop(coast);
+  Tray(0, coast);
+  return;
 }

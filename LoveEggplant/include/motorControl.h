@@ -19,3 +19,6 @@ bool turnLeftWithGyro(int power, float target, float timeLimit, bool fullTime, f
 bool turnRightWithGyro(int power, float target, float timeLimit, bool fullTime, float P = 0.33, float I = 0.0001, float D = 1.25);
 bool turnRightWithGyroL(int power, float target, float timeLimit, bool fullTime, float P = 0.33, float I = 0.0001, float D = 1.25);
 bool turnLeftWithGyroR(int power, float target, float timeLimit, bool fullTime, float P = 0.33, float I = 0.0001, float D = 1.25);
+void autoTurnRight(float S,float a,int time1);
+void autoTurnLeft(float S,float a,int time1);
+void autoGoForward(float target,float a,int time1);

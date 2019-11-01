@@ -12,7 +12,11 @@ void activity_main(){
   Brain.Screen.printAt(SCREEN_MAX_WIDTH / 2, SCREEN_MAX_HEIGHT / 5 * 3, "Motor Info");
   Brain.Screen.printAt(SCREEN_MAX_WIDTH / 2, SCREEN_MAX_HEIGHT / 5 * 4, "About");
   
-  if(auton <= 4)  {
+  if(auton == -1) {
+    Brain.Screen.setPenColor(vex::color(0xffffff));
+    Brain.Screen.printAt(10, 60, "autoTest is selected");
+  }
+  else if(auton <= 4)  {
     Brain.Screen.setPenColor(vex::color(0x0000ff));
     Brain.Screen.printAt(10, 60, (blueAuto[auton - 1] + " is selected").c_str());
   }

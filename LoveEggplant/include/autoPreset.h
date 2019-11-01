@@ -4,7 +4,7 @@ using namespace std;
 const static string blueAuto[4] = {
   "Small 8",
   "Big 8",
-  "",
+  "Big 7",
   "",
 };
 

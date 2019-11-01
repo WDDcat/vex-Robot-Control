@@ -53,5 +53,9 @@ extern limit LimitBack;
 extern limit LimitFront;
 extern limit LimitDown;
 extern gyro Gyro;
+extern line Line;
 
 extern int auton;
+
+extern double Ldeg;
+extern double Rdeg;

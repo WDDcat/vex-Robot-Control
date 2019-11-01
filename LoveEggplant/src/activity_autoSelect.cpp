@@ -19,6 +19,10 @@ void activity_autoSelect(){
   Brain.Screen.printAt(SCREEN_MAX_WIDTH / 2 - 50, 30, "<<");
 
   Brain.Screen.setFont(vex::fontType::mono20);
+  if(auton == -1) {
+    Brain.Screen.setPenColor(vex::color(0xffffff));
+    Brain.Screen.printAt(10, 60, "autoTest is selected");
+  }
   if(auton <= 4)  {
     Brain.Screen.setPenColor(vex::color(0x0000ff));
     Brain.Screen.printAt(10, 60, (blueAuto[auton - 1] + " is selected").c_str());

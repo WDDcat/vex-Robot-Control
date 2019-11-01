@@ -41,6 +41,8 @@ void gyroInit(){
 }
 
 void ResetMotor(){
+  Ldeg = LeftMotor2.rotation(deg);
+  Rdeg = RightMotor2.rotation(deg);
   LeftMotor1.setBrake(coast);
   LeftMotor2.setBrake(coast);
   RightMotor1.setBrake(coast);
@@ -147,8 +149,7 @@ bool goForward(int power, float target, float timeLimit){
   float delta_errR = 0.0;
 	float voltL = 0.0;
   float voltR = 0.0;
-  LeftMotor2.resetRotation();
-  RightMotor2.resetRotation();
+  ResetMotor();
   Brain.resetTimer();
 	while(Brain.timer(msec) < timeLimit){
     float curL = LeftMotor2.rotation(deg);
@@ -159,7 +160,7 @@ bool goForward(int power, float target, float timeLimit){
     if(curR / target > KI_START_PERCENT)  total_errR += errR;
     delta_errL = errL - last_errL;
     delta_errR = errR - last_errR;
-    if(errL < 15 || errR < 15){
+    if(errL < 1 || errR < 1){
       sMove(0,0);
       Move(0,0);
       return true;
@@ -172,8 +173,8 @@ bool goForward(int power, float target, float timeLimit){
     voltL = voltL * acc;
     voltR = voltR * acc;
 
-    float rpmAdjust = 0.5 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm)) * (curL / target);
-		float rotationAdjust = 0.2 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg)) * (curL / target);
+    float rpmAdjust = 0.0 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm));// * (curL / target)
+		float rotationAdjust = 0 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg));// * (curL / target)
     Move(CONSTRAIN(voltL - rpmAdjust - rotationAdjust, -power, power),
          CONSTRAIN(voltR + rpmAdjust + rotationAdjust, -power, power));
 
@@ -209,7 +210,7 @@ bool goBackward(int power, float target, float timeLimit){
     if(curR / target > KI_START_PERCENT)  total_errR += errR;
     delta_errL = errL - last_errL;
     delta_errR = errR - last_errR;
-    if(errL > -15 || errR > -15){
+    if(errL > -1 || errR > -1){
       sMove(0,0);
       Move(0,0);
       return true;
@@ -222,8 +223,8 @@ bool goBackward(int power, float target, float timeLimit){
     voltL = voltL * acc;
     voltR = voltR * acc;
 
-    float rpmAdjust = 0.5 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm)) * (curL / target);
-		float rotationAdjust = 0.2 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg)) * (curL / target);
+    float rpmAdjust = 0 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm)) * (curL / target);
+		float rotationAdjust = 0 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg)) * (curL / target);
     Move(CONSTRAIN(voltL + rpmAdjust + rotationAdjust, -power, power),
          CONSTRAIN(voltR - rpmAdjust - rotationAdjust, -power, power));
 
@@ -563,4 +564,194 @@ bool turnLeftWithGyroR(int power, float target, float timeLimit, bool fullTime, 
   }
   Stop(hold);
   return false;
+}
+
+void autoGoForward(float target,float a,int time1)
+{
+  float current = 0;
+  float vmax = 200;
+  float v = 0;
+    
+  ResetMotor();
+  Brain.resetTimer();
+  while(current < target -3 && Brain.timer(timeUnits::msec) < time1)
+  {
+      current = (fabs(RightMotor2.rotation(rotationUnits::deg)) + fabs(LeftMotor2.rotation(rotationUnits::deg)) + fabs(RightMotor1.rotation(rotationUnits::deg)) + fabs(LeftMotor1.rotation(rotationUnits::deg))) / 4;
+      
+      if((target - vmax*vmax/a) < 0)
+      {
+          if(current < target/2)
+          {
+              v = 10.0+sqrt(current*2*a);
+          }
+          else
+          {
+              v = sqrt((target-current)*2*a);
+          }
+      }
+      else
+      {
+          if(current<vmax*vmax/(2*a))
+          {
+              v=5.0+sqrt(current*2*a);   
+          }
+          
+          else if(current >= (vmax*vmax/(2*a)) && current < (target-vmax*vmax/(2*a)))
+          {
+              v=vmax;
+          }
+          else if(current>=(target-vmax*vmax/(2*a)))
+          {
+              v=sqrt((target-current)*2*a);
+          }
+    }
+    Move(v, v);
+    sleep(20);        
+  }
+  Stop(brake);
+  sleep(100);
+}
+
+
+void autoTurnRight(float target,float a,int time1)
+{
+    float current = 0;
+    float vmax = 200;
+    float v = 0;
+    
+
+    RightMotor2.resetRotation();
+    LeftMotor2.resetRotation();
+    RightMotor1.resetRotation();
+    LeftMotor1.resetRotation();
+    Brain.resetTimer();
+    while(current < target -3 && Brain.timer(timeUnits::msec) < time1)
+    {
+        current = (fabs(RightMotor2.rotation(rotationUnits::deg)) + fabs(LeftMotor2.rotation(rotationUnits::deg)) + fabs(RightMotor1.rotation(rotationUnits::deg)) + fabs(LeftMotor1.rotation(rotationUnits::deg))) / 4;
+        
+        if( current < 0)
+        {
+             current = -1 * current;
+        }
+        
+        //current = ffabs(current);
+        
+        if((target - vmax*vmax/a) < 0)
+        {
+            if(current < target/2)
+            {
+                v = fabs(10+sqrt(current*2*a));
+            }
+            else
+            {
+                v = fabs(sqrt((target-current)*2*a));
+            }
+        }
+        else
+        {
+            if(current<vmax*vmax/(2*a))
+            {
+                v=5+sqrt(current*2*a);   
+            }
+            
+            else if(current >= (vmax*vmax/(2*a)) && current < (target-vmax*vmax/(2*a)))
+            {
+                v=vmax;
+            }
+            else if(current>=(target-vmax*vmax/(2*a)))
+            {
+                v=sqrt((target-current)*2*a);
+            }
+        }
+        if(v < 0)
+        {
+          v = -v;
+        }
+        
+            LeftMotor1.spin(directionType::fwd, v, velocityUnits::rpm);
+            LeftMotor2.spin(directionType::fwd, v, velocityUnits::rpm);
+            RightMotor1.spin(directionType::rev, v, velocityUnits::rpm);
+            RightMotor2.spin(directionType::rev, v, velocityUnits::rpm);
+           
+        
+        
+        sleep(20);        
+    }
+    
+    LeftMotor1.stop(brakeType::brake);
+    LeftMotor2.stop(brakeType::brake);
+    RightMotor1.stop(brakeType::brake);
+    RightMotor2.stop(brakeType::brake);
+    sleep(100);
+}
+
+void autoTurnLeft(float target,float a,int time1)
+{
+    float current = 0;
+    float vmax = 200;
+    float v = 0;
+    
+
+    RightMotor2.resetRotation();
+    LeftMotor2.resetRotation();
+    RightMotor1.resetRotation();
+    LeftMotor1.resetRotation();
+    Brain.resetTimer();
+    while(current < target -3 && Brain.timer(timeUnits::msec) < time1)
+    {
+        current = (fabs(RightMotor2.rotation(rotationUnits::deg)) + fabs(LeftMotor2.rotation(rotationUnits::deg)) + fabs(RightMotor1.rotation(rotationUnits::deg)) + fabs(LeftMotor1.rotation(rotationUnits::deg))) / 4;
+        
+        if( current < 0)
+        {
+             current = -1 * current;
+        }
+        
+        //current = fabs(current);
+        
+        if((target - vmax*vmax/a) < 0)
+        {
+            if(current < target/2)
+            {
+                v = fabs(10+sqrt(current*2*a));
+            }
+            else
+            {
+                v = fabs(sqrt((target-current)*2*a));
+            }
+        }
+        else
+        {
+            if(current<vmax*vmax/(2*a))
+            {
+                v=5+sqrt(current*2*a);   
+            }
+            
+            else if(current >= (vmax*vmax/(2*a)) && current < (target-vmax*vmax/(2*a)))
+            {
+                v=vmax;
+            }
+            else if(current>=(target-vmax*vmax/(2*a)))
+            {
+                v=sqrt((target-current)*2*a);
+            }
+        }
+        if(v < 0)
+        {
+          v = -v;
+        }
+        
+            LeftMotor1.spin(directionType::rev, v, velocityUnits::rpm);
+            LeftMotor2.spin(directionType::rev, v, velocityUnits::rpm);
+            RightMotor1.spin(directionType::fwd, v, velocityUnits::rpm);
+            RightMotor2.spin(directionType::fwd, v, velocityUnits::rpm);
+           
+        
+        sleep(20);        
+    }
+    
+    LeftMotor1.stop(brakeType::brake);
+    LeftMotor2.stop(brakeType::brake);
+    RightMotor1.stop(brakeType::brake);
+    RightMotor2.stop(brakeType::brake);
+    sleep(100);
 }
