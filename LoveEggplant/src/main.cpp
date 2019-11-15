@@ -19,8 +19,9 @@ brain Brain;
 controller Controller = controller();
 //PeiLianChe   //12 13 15 14 8 19 9 5 F E C
 
-/*WSF*//*AEFCH*///int motorPreset[8] = {PORT3, PORT15, PORT7, PORT6, PORT4, PORT10, PORT11, PORT14};
-/*DYZ*//*DEBCH*/int motorPreset[8] = {PORT6, PORT11, PORT15, PORT20, PORT1, PORT2, PORT8, PORT19};
+/*WSF*//*AFCH*///int motorPreset[8] = {PORT3, PORT15, PORT7, PORT6, PORT4, PORT10, PORT11, PORT14};
+/*DYZ*//*DBCX*///int motorPreset[8] = {PORT6, PORT11, PORT15, PORT20, PORT1, PORT2, PORT8, PORT19};
+/*YSY*//*DXBX*/int motorPreset[8] = {PORT14, PORT15, PORT18, PORT19, PORT1, PORT20, PORT5, PORT9};
 motor LeftMotor1  (motorPreset[0],    gearSetting::ratio18_1, false);
 motor LeftMotor2  (motorPreset[1],    gearSetting::ratio18_1, false);
 motor RightMotor1 (motorPreset[2],    gearSetting::ratio18_1, true);
@@ -30,17 +31,14 @@ motor TrayMotor   (motorPreset[5],    gearSetting::ratio18_1, true);
 motor LeftIntake  (motorPreset[6],    gearSetting::ratio18_1, false);
 motor RightIntake (motorPreset[7],    gearSetting::ratio18_1, true);
 limit LimitBack   (Brain.ThreeWirePort.D);
-// limit LimitFront  (Brain.ThreeWirePort.E);
-limit LimitDown   (Brain.ThreeWirePort.B);
-gyro Gyro         (Brain.ThreeWirePort.C);
+limit LimitDown   (Brain.ThreeWirePort.H);
+gyro Gyro         (Brain.ThreeWirePort.B);
 //line Line         (Brain.ThreeWirePort.H);
 
 vex::competition Competition;
 
 // define your global instances of motors and other devices here
 int auton = -1;
-double Ldeg = 0.0;
-double Rdeg = 0.0;
 bool initComplete = false;
 
 /*---------------------------------------------------------------------------*/
@@ -65,13 +63,13 @@ void pre_auton( void ) {
   activity_loading("7258A", false);
   while(true){
     double cur = GyroGetAngle();
-    double cur1 = LeftMotor2.rotation(deg) - Ldeg;
-    double cur2 = RightMotor2.rotation(deg) - Rdeg;
+    double cur1 = LeftMotor2.rotation(deg);
+    double cur2 = RightMotor2.rotation(deg);
     Brain.Screen.setPenColor(vex::color::cyan);
     Brain.Screen.setFont(vex::fontType::mono30);
-    Brain.Screen.printAt(250, 23, "Gyro: %f", cur);
-    Brain.Screen.printAt(250, 53, "Left: %f", cur1);
-    Brain.Screen.printAt(250, 83, "Right %f", cur2);
+    Brain.Screen.printAt(400, 23, "%f", cur);
+    Brain.Screen.printAt(400, 47, "%f", cur1);
+    Brain.Screen.printAt(400, 71, "%f", cur2);
     onClickListener();
   }
   // All activities that occur before the competition starts
@@ -164,8 +162,9 @@ void drivercontrol( void ) {
       else  Tray(0, brake);
     }
 
+    // Lift control
     if(L1){
-      if(TrayMotor.rotation(deg) < 380)  Tray(100);
+      if(TrayMotor.rotation(deg) < 385)  Tray(100);
       Lift(100);
       LiftDown = false;
     }
@@ -182,9 +181,8 @@ void drivercontrol( void ) {
       else  Lift(0);
     }
 
-
-    if(BtnA /*&& Line.value(pct) > 10*/)      Intake(100);
-    else if(R1) Intake(100);
+    //Intake control
+    if(R1) Intake(100);
     else if(R2) Intake(-100);
     else        Intake(1);
 

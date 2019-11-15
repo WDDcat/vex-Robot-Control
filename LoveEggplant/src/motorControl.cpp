@@ -41,8 +41,6 @@ void gyroInit(){
 }
 
 void ResetMotor(){
-  Ldeg = LeftMotor2.rotation(deg);
-  Rdeg = RightMotor2.rotation(deg);
   LeftMotor1.setBrake(coast);
   LeftMotor2.setBrake(coast);
   RightMotor1.setBrake(coast);
@@ -116,9 +114,15 @@ void Tray(float power, brakeType type, float rotation){
   }
 }
 
-void Intake(float power){
-  LeftIntake.spin(fwd, 0.128 * power, voltageUnits::volt);
-  RightIntake.spin(fwd, 0.128 * power, voltageUnits::volt);
+void Intake(float power, brakeType type){
+  if(power == 0){
+    LeftIntake.stop(type);
+    RightIntake.stop(type);
+  }
+  else{
+    LeftIntake.spin(fwd, 0.128 * power, voltageUnits::volt);
+    RightIntake.spin(fwd, 0.128 * power, voltageUnits::volt);
+  }
 }
 
 //////////////////////AUTO CONTROL////////////////////////
@@ -198,8 +202,7 @@ bool goBackward(int power, float target, float timeLimit, float P, float I, floa
   float delta_errR = 0.0;
 	float voltL = 0.0;
   float voltR = 0.0;
-  LeftMotor2.resetRotation();
-  RightMotor2.resetRotation();
+  ResetMotor();
   Brain.resetTimer();
 	while(Brain.timer(msec) < timeLimit){
     float curL = LeftMotor2.rotation(deg);
@@ -238,31 +241,39 @@ bool goBackward(int power, float target, float timeLimit, float P, float I, floa
 }
 
 
-bool rushForward(int power, float target, float timeLimit){
-  LeftMotor2.resetRotation();
-  RightMotor2.resetRotation();
+bool rushForward(int power, float target, float timeLimit, bool acc){
+  ResetMotor();
   Brain.resetTimer();
 	while(Brain.timer(msec) < timeLimit){
     if((LeftMotor2.rotation(deg) + RightMotor2.rotation(deg)) / 2 > target){
       // Stop(hold);
       return true;
     }
-    else  Move(power, power);
+    else{
+      float a = 1.0;
+      if(acc)
+        a = CONSTRAIN(Brain.timer(msec) / 1000, 0, 1);
+      Move(power * a, power * a);
+    }
   }
   Stop(hold);
   return false;
 }
 
-bool rushBackward(int power, float target, float timeLimit){
-  LeftMotor2.resetRotation();
-  RightMotor2.resetRotation();
+bool rushBackward(int power, float target, float timeLimit, bool acc){
+  ResetMotor();
   Brain.resetTimer();
 	while(Brain.timer(msec) < timeLimit){
     if((LeftMotor2.rotation(deg) + RightMotor2.rotation(deg)) / 2 < target){
       // Stop(hold);
       return true;
     }
-    else  Move(-power, -power);
+    else{
+      float a = 1.0;
+      if(acc)
+        a = CONSTRAIN(Brain.timer(msec) / 1000, 0, 1);
+      Move(-power * a, -power * a);
+    }
   }
   return false;
 }
@@ -310,124 +321,126 @@ void backToWall(float power, int dis1, int dis2, int dis3, int dis4, int time, b
   Stop(hold);
 }
 
-bool turnLeft(int power, float target, float timeLimit){
+bool turnLeft(int power, float target, float timeLimit, float P, float I, float D){
   float errL = 0.0;
   float errR = 0.0;
-	float err_lastL = 0.0;
-  float err_lastR = 0.0;
+	float last_errL = 0.0;
+  float last_errR = 0.0;
+  float total_errL = 0.0;
+  float total_errR = 0.0;
+	float delta_errL = 0.0;
+  float delta_errR = 0.0;
 	float voltL = 0.0;
   float voltR = 0.0;
-	float integralL = 0.0;
-  float integralR = 0.0;
-	float indexL = 0.0;
-  float indexR = 0.0;
-  LeftMotor2.resetRotation();
-  RightMotor2.resetRotation();
-  while(1){
+  ResetMotor();
+  Brain.resetTimer();
+	while(Brain.timer(msec) < timeLimit){
     float curL = LeftMotor2.rotation(deg);
     float curR = RightMotor2.rotation(deg);
-		errL = target + curL;
+    errL = - target - curL;
     errR = target - curR;
-		
-		if(abs((int) errL) > target){
-			indexL = 0;
-		}
-		else if(abs((int) errL) < target * KI_START_PERCENT){
-			indexL = 1;
-			integralL += errL / 2;
-		}
-		else{
-			indexL = (target - abs((int) errL)) / KI_INDEX_PAR;
-			integralL += errL / 2;
-		}
+    if(curL / target > KI_START_PERCENT)  total_errL += errL;
+    if(curR / target > KI_START_PERCENT)  total_errR += errR;
+    delta_errL = errL - last_errL;
+    delta_errR = errR - last_errR;
+    if(errL > -1 || errR < 1){
+      sMove(0,0);
+      Move(0,0);
+      return true;
+    }
 
-    if(abs((int) errR) > target){
-			indexR = 0;
-		}
-		else if(abs((int) errR) < target * KI_START_PERCENT){
-			indexR = 1;
-			integralR += errR / 2;
-		}
-		else{
-			indexR = (target - abs((int) errR)) / KI_INDEX_PAR;
-			integralR += errR / 2;
-		}
+    voltL = KP * errL + KI * total_errL + KD * delta_errL;
+    voltR = KP * errR + KI * total_errR + KD * delta_errR;
+
+    float acc = CONSTRAIN(Brain.timer(msec) / 1000, 0, 1);
+    voltL = voltL * acc;
+    voltR = voltR * acc;
+
+    float rpmAdjust = 0.0 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm));// * (curL / target)
+		float rotationAdjust = 0 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg));// * (curL / target)
+    Move(CONSTRAIN(voltL - rpmAdjust - rotationAdjust, -power, power),
+         CONSTRAIN(voltR + rpmAdjust + rotationAdjust, -power, power));
+
+    last_errL = errL;
+    last_errR = errR;
 		
-		voltL = KP * errL + indexL * KI * integralL + KD * (errL - err_lastL);
-    voltR = KP * errR + indexR * KI * integralR + KD * (errR - err_lastR);
-    if(voltL < 0.01 || voltR < 0.01) return true;
-		integralL += errL / 2;
-    integralR += errR / 2;
-		err_lastL = errL;
-    err_lastR = errR;
-		
-    float rpmAdjust = 1.0 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm));
-		float rotationAdjust = 0;//2.0 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg));
-    Move(CONSTRAIN(- voltL + rpmAdjust + rotationAdjust, -power, 0),
-         CONSTRAIN(voltR + rpmAdjust + rotationAdjust, 0, power));
+		sleep(10);
 	}
   Stop(hold);
   return false;
 }
 
-bool turnRight(int power, float target, float timeLimit){
+bool turnRight(int power, float target, float timeLimit, float P, float I, float D){
   float errL = 0.0;
   float errR = 0.0;
-	float err_lastL = 0.0;
-  float err_lastR = 0.0;
+	float last_errL = 0.0;
+  float last_errR = 0.0;
+  float total_errL = 0.0;
+  float total_errR = 0.0;
+	float delta_errL = 0.0;
+  float delta_errR = 0.0;
 	float voltL = 0.0;
   float voltR = 0.0;
-	float integralL = 0.0;
-  float integralR = 0.0;
-	float indexL = 0.0;
-  float indexR = 0.0;
-  LeftMotor2.resetRotation();
-  RightMotor2.resetRotation();
-  while(1){
+  ResetMotor();
+  Brain.resetTimer();
+	while(Brain.timer(msec) < timeLimit){
     float curL = LeftMotor2.rotation(deg);
     float curR = RightMotor2.rotation(deg);
-		errL = target - curL;
-    errR = target + curR;
-		
-		if(abs((int) errL) > target){
-			indexL = 0;
-		}
-		else if(abs((int) errL) < target * KI_START_PERCENT){
-			indexL = 1;
-			integralL += errL / 2;
-		}
-		else{
-			indexL = (target - abs((int) errL)) / KI_INDEX_PAR;
-			integralL += errL / 2;
-		}
+    errL = target - curL;
+    errR = - target - curR;
+    if(curL / target > KI_START_PERCENT)  total_errL += errL;
+    if(curR / target > KI_START_PERCENT)  total_errR += errR;
+    delta_errL = errL - last_errL;
+    delta_errR = errR - last_errR;
+    if(errL < 1 || errR > -1){
+      sMove(0,0);
+      Move(0,0);
+      return true;
+    }
 
-    if(abs((int) errR) > target){
-			indexR = 0;
-		}
-		else if(abs((int) errR) < target * KI_START_PERCENT){
-			indexR = 1;
-			integralR += errR / 2;
-		}
-		else{
-			indexR = (target - abs((int) errR)) / KI_INDEX_PAR;
-			integralR += errR / 2;
-		}
-		
-		voltL = KP * errL + indexL * KI * integralL + KD * (errL - err_lastL);
-    voltR = KP * errR + indexR * KI * integralR + KD * (errR - err_lastR);
-    if(voltL < 0.01 || voltR < 0.01) return true;
-		integralL += errL / 2;
-    integralR += errR / 2;
-		err_lastL = errL;
-    err_lastR = errR;
-		
-    float rpmAdjust = 1.0 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm));
-		float rotationAdjust = 0;//2.0 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg));
-    Move(CONSTRAIN(voltL - rpmAdjust - rotationAdjust, 0, power),
-         CONSTRAIN(- voltR - rpmAdjust - rotationAdjust, -power, 0));
+    voltL = KP * errL + KI * total_errL + KD * delta_errL;
+    voltR = KP * errR + KI * total_errR + KD * delta_errR;
 
-    sleep(5);
+    float acc = CONSTRAIN(Brain.timer(msec) / 1000, 0, 1);
+    voltL = voltL * acc;
+    voltR = voltR * acc;
+
+    float rpmAdjust = 0.0 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm));// * (curL / target)
+		float rotationAdjust = 0 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg));// * (curL / target)
+    Move(CONSTRAIN(voltL - rpmAdjust - rotationAdjust, -power, power),
+         CONSTRAIN(voltR + rpmAdjust + rotationAdjust, -power, power));
+
+    last_errL = errL;
+    last_errR = errR;
+		
+		sleep(10);
 	}
+  Stop(hold);
+  return false;
+}
+
+bool rushLeft(int power, float target, float timeLimit){
+  ResetMotor();
+  Brain.resetTimer();
+	while(Brain.timer(msec) < timeLimit){
+    if((fabs(LeftMotor2.rotation(deg)) + fabs(RightMotor2.rotation(deg))) / 2 > target){
+      return true;
+    }
+    else  Move(-power, power);
+  }
+  Stop(hold);
+  return false;
+}
+
+bool rushRight(int power, float target, float timeLimit){
+  ResetMotor();
+  Brain.resetTimer();
+	while(Brain.timer(msec) < timeLimit){
+    if((fabs(LeftMotor2.rotation(deg)) + fabs(RightMotor2.rotation(deg))) / 2 > target){
+      return true;
+    }
+    else  Move(power, -power);
+  }
   Stop(hold);
   return false;
 }
@@ -561,6 +574,32 @@ bool turnLeftWithGyroR(int power, float target, float timeLimit, bool fullTime, 
     LeftMotor2.stop(hold);
 
     sleep(10);
+  }
+  Stop(hold);
+  return false;
+}
+
+bool rushLeftWithGyro(int power, float target, float timeLimit){
+  ResetMotor();
+  Brain.resetTimer();
+  while(Brain.timer(msec) < timeLimit){
+    if(GyroGetAngle() < target){
+      return true;
+    }
+    else  Move(-power, power);
+  }
+  Stop(hold);
+  return false;
+}
+
+bool rushRightWithGyro(int power, float target, float timeLimit){
+  ResetMotor();
+  Brain.resetTimer();
+  while(Brain.timer(msec) < timeLimit){
+    if(GyroGetAngle() > target){
+      return true;
+    }
+    else  Move(power, -power);
   }
   Stop(hold);
   return false;

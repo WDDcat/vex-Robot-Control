@@ -7,7 +7,7 @@
 extern int auton;
 
 void runAuto(){
-  //while (!GyroGetValid()) sleep(10);
+  while (!GyroGetValid()) sleep(10);
   switch(auton){
   case -1:
     autoTest(); break;
@@ -330,69 +330,61 @@ void auto8(){
 }
 
 void autoTest(){
+  timer T1;
+  T1.clear();
   spread();
-  sleep(350);
   Lift(-15);
-  automove(940, 940, 35, 3400);
+  rushForward(90, 180, 1500, true);
+  rushForward(27, 570, 3500, false);
   Stop(hold);
   Lift(0);
-  backToWall(90, 20, 350, 395, 380, 500, true);
-  // automove(140, -140, 100,100000);
-    
-  // sleep(5000);
-
-  // if(!rushBackward(100, -700, 3000))  goto STOP; 
-  // Move(-70, -33);
-  // sleep(460);
-  Move(-40, -40);
-  sleep(380);
-
+  while(GyroGetAngle() < 50.7){
+    LeftMotor1.spin(fwd, 58 - GyroGetAngle(), rpm);//62
+    LeftMotor2.spin(fwd, 58 - GyroGetAngle(), rpm);
+    RightMotor1.stop(hold);
+    RightMotor2.stop(hold);
+  }
+  Stop(hold);
+  if(!rushBackward(100, -600, 3000, true))  goto STOP;
+  Move(-50, -50);
+  sleep(200);
+  Move(-70, -30);
+  sleep(500);
+  Move(-20, -20);
+  sleep(15);
   Stop();
-  Lift(-10);
-  LeftMotor1.resetRotation();
-  while(LeftMotor1.rotation(deg) < 150){
-    float speed = 180 - LeftMotor1.rotation(deg);
-    Move(CONSTRAIN(speed, 30, 90), CONSTRAIN(speed, 30, 90));
-  }
-  if(!goForward(23, 870, 4400))  goto STOP;
+  goto STOP;
+  rushForward(86, 150, 1500, true);
+  rushForward(22, 710, 4400, false);
   Stop(hold);
   Lift(0);
-  sleep(100);
-  if(GyroGetAbsAngle() > 10){
-    if(GyroGetAngle() > 0)  turnRightWithGyro(60, 0, 500, false);
-    else                    turnLeftWithGyro(60, 0, 500, false);
-  }
-  LeftMotor1.resetRotation();
-  // if(!goBackward(100, -350, 2000)) goto STOP;
-  Move(-85, 85);
-  sleep(750);
-  Intake(0);
-  TrayMotor.startRotateTo(440, deg);
-  turnLeftWithGyro(100, -194.0, 1550, false, 0.37, 0.0, 0.95);
-  rushForward(100, 400, 1500);
-  rushForward(70, 100, 800);
-  rushForward(50, 100, 800);
+  Intake(0, hold);
+  TrayMotor.startRotateTo(560, deg);
+  turnLeftWithGyro(100, -170.0, 1550, false, 0.39, 0.0, 0.42);
+  rushForward(100, 300, 1800, true);
+  rushForward(60, 220, 1500, false);
   Move(40, 40);
-  sleep(400);
+  sleep(50);
   Move(-10, -10);
   sleep(100);
   Stop();
   Move(5, 5);
-  Tray(70, coast, 600);
-  Tray(60, coast, 800);
-  Tray(50, coast, 1100);
+  Tray(80, coast, 750);
+  Tray(75, coast, 800);
+  Tray(70, coast, 1100);
   Tray(35);
-  sleep(230);
-  Move(30, 30);
-  sleep(200);
-  Move(0, 0);
-  sleep(250);
+  Move(15, 15);
+  sleep(400);
   Tray(0, coast);
   Move(-50, -50);
-  sleep(700);
+  while(T1.time(msec) < 15500){
+    sleep(5);
+  }
   Stop(coast);
 STOP:
   Intake(0);
-  Stop(brake);
+  Stop(coast);
+  Tray(0, coast);
+  Lift(0);
   return;
 }

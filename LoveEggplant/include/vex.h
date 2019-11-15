@@ -50,7 +50,6 @@ extern motor TrayMotor;
 extern motor LeftIntake;
 extern motor RightIntake;
 extern limit LimitBack;
-extern limit LimitFront;
 extern limit LimitDown;
 extern gyro Gyro;
 extern line Line;
