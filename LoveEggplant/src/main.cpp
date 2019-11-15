@@ -19,8 +19,8 @@ brain Brain;
 controller Controller = controller();
 //PeiLianChe   //12 13 15 14 8 19 9 5 F E C
 
-/*WSF*//*AEFCH*/int motorPreset[8] = {PORT3, PORT15, PORT7, PORT6, PORT4, PORT10, PORT11, PORT14};
-/*DYZ*//*DEBCH*///int motorPreset[8] = {PORT4, PORT11, PORT10, PORT20, PORT1, PORT3, PORT9, PORT8};
+/*WSF*//*AEFCH*///int motorPreset[8] = {PORT3, PORT15, PORT7, PORT6, PORT4, PORT10, PORT11, PORT14};
+/*DYZ*//*DEBCH*/int motorPreset[8] = {PORT6, PORT11, PORT15, PORT20, PORT1, PORT2, PORT8, PORT19};
 motor LeftMotor1  (motorPreset[0],    gearSetting::ratio18_1, false);
 motor LeftMotor2  (motorPreset[1],    gearSetting::ratio18_1, false);
 motor RightMotor1 (motorPreset[2],    gearSetting::ratio18_1, true);
@@ -29,11 +29,11 @@ motor LiftMotor   (motorPreset[4],    gearSetting::ratio18_1, false);
 motor TrayMotor   (motorPreset[5],    gearSetting::ratio18_1, true);
 motor LeftIntake  (motorPreset[6],    gearSetting::ratio18_1, false);
 motor RightIntake (motorPreset[7],    gearSetting::ratio18_1, true);
-limit LimitBack   (Brain.ThreeWirePort.A);
+limit LimitBack   (Brain.ThreeWirePort.D);
 // limit LimitFront  (Brain.ThreeWirePort.E);
-limit LimitDown   (Brain.ThreeWirePort.F);
+limit LimitDown   (Brain.ThreeWirePort.B);
 gyro Gyro         (Brain.ThreeWirePort.C);
-line Line         (Brain.ThreeWirePort.H);
+//line Line         (Brain.ThreeWirePort.H);
 
 vex::competition Competition;
 
@@ -58,19 +58,20 @@ void pre_auton( void ) {
   RightIntake.setBrake(coast);
   ResetMotor();
   
-  // gyroInit();
-  // task setGyro(GyroTask);
-  // initComplete = true;
+  gyroInit();
+  task setGyro(GyroTask);
+  initComplete = true;
 
   activity_loading("7258A", false);
   while(true){
-    //double cur = GyroGetAngle();
-    double cur = LeftMotor2.rotation(deg) - Ldeg;
+    double cur = GyroGetAngle();
+    double cur1 = LeftMotor2.rotation(deg) - Ldeg;
     double cur2 = RightMotor2.rotation(deg) - Rdeg;
     Brain.Screen.setPenColor(vex::color::cyan);
     Brain.Screen.setFont(vex::fontType::mono30);
-    Brain.Screen.printAt(360, 23, "%f", cur);
-    Brain.Screen.printAt(360, 48, "%f", cur2);
+    Brain.Screen.printAt(250, 23, "Gyro: %f", cur);
+    Brain.Screen.printAt(250, 53, "Left: %f", cur1);
+    Brain.Screen.printAt(250, 83, "Right %f", cur2);
     onClickListener();
   }
   // All activities that occur before the competition starts
@@ -164,6 +165,7 @@ void drivercontrol( void ) {
     }
 
     if(L1){
+      if(TrayMotor.rotation(deg) < 380)  Tray(100);
       Lift(100);
       LiftDown = false;
     }
@@ -176,26 +178,14 @@ void drivercontrol( void ) {
       else  Lift(-100);
     }
     else{
-      // if(BtnB)  {LiftLow = true; LiftHigh = false;}
-      // if(BtnX)  {LiftLow = false; LiftHigh = true;}
-      // if(LiftLow){
-      //   if(LiftMotor.rotation(deg) < 700) Lift(100);
-      //   else {Lift(0); LiftLow = false;}
-      // }
-      // else if(LiftHigh){
-      //   if(LiftMotor.rotation(deg) < 1100) Lift(100);
-      //   else {Lift(0); LiftHigh = false;}
-      // }
-      // else{
-        if(LiftDown && !LimitDown.pressing()) Lift(-10); 
-        else  Lift(0);
-      // }
+      if(LiftDown && !LimitDown.pressing()) Lift(-10); 
+      else  Lift(0);
     }
 
 
-    if(BtnA && Line.value(pct) > 10)      Intake(100);
+    if(BtnA /*&& Line.value(pct) > 10*/)      Intake(100);
     else if(R1) Intake(100);
-    else if(R2) Intake(-35);
+    else if(R2) Intake(-100);
     else        Intake(1);
 
     onClickListener();

@@ -138,7 +138,7 @@ void spread(){
   sleep(100);
 }
 
-bool goForward(int power, float target, float timeLimit){
+bool goForward(int power, float target, float timeLimit, float P, float I, float D){
 	float errL = 0.0;
   float errR = 0.0;
 	float last_errL = 0.0;
@@ -187,7 +187,7 @@ bool goForward(int power, float target, float timeLimit){
   return false;
 }
 
-bool goBackward(int power, float target, float timeLimit){
+bool goBackward(int power, float target, float timeLimit, float P, float I, float D){
 	float errL = 0.0;
   float errR = 0.0;
 	float last_errL = 0.0;
@@ -268,40 +268,40 @@ bool rushBackward(int power, float target, float timeLimit){
 }
 
 void backToWall(float power, int dis1, int dis2, int dis3, int dis4, int time, bool left){
-  float k1 = 0.5;
-  float k2 = 0.3;
+  float k1 = 0.2;
+  float k2 = 0.2;
   LeftMotor2.resetRotation();
   while(LeftMotor2.rotation(vex::rotationUnits::deg) > -dis1) {
-    Move(-power, -power);
+    sMove(-power, -power);
   }
   if(left){
     RightMotor2.resetRotation();
     while(RightMotor2.rotation(deg) > -dis2) {
-      Move(-power * k1, -power);
+      sMove(-power * k1, -power);
     }
   }
   else{
     LeftMotor2.resetRotation();
     while(LeftMotor2.rotation(deg) > -dis2) {
-      Move(-power, -power *k1);
+      sMove(-power, -power *k1);
     }
   }
 
   LeftMotor2.resetRotation();
   while(LeftMotor2.rotation(vex::rotationUnits::deg) > -dis3) {
-    Move(-100.0, -100.0);
+    sMove(-100.0, -100.0);
   }
 
   if(left){
     LeftMotor2.resetRotation();
     while(LeftMotor2.rotation(vex::rotationUnits::deg) > -dis4) {
-      Move(-power, -power * k2);
+      sMove(-power, -power * k2);
     }
   }
   else{
     RightMotor2.resetRotation();
     while(RightMotor2.rotation(vex::rotationUnits::deg) > -dis4) {
-      Move(-power * k2, -power);
+      sMove(-power * k2, -power);
     }
   }
 

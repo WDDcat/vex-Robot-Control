@@ -8,8 +8,8 @@ void Tray(float power, vex::brakeType type = vex::brake, float rotation = 0.0);
 void Intake(float power);
 
 void spread();
-bool goForward(int power, float target, float timeLimit);
-bool goBackward(int power, float target, float timeLimit);
+bool goForward(int power, float target, float timeLimit, float P = 0.6, float I = 0.007, float D = 4.0);
+bool goBackward(int power, float target, float timeLimit, float P = 0.6, float I = 0.007, float D = 4.0);
 bool rushForward(int power, float target, float timeLimit);
 bool rushBackward(int power, float target, float timeLimit);
 bool turnLeft(int power, float target, float timeLimit);
