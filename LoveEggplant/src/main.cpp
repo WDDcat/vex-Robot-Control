@@ -20,20 +20,20 @@ controller Controller = controller();
 //PeiLianChe   //12 13 15 14 8 19 9 5 F E C
 
 /*WSF*//*AFCH*///int motorPreset[8] = {PORT3, PORT15, PORT7, PORT6, PORT4, PORT10, PORT11, PORT14};
-/*DYZ*//*DBCX*///int motorPreset[8] = {PORT6, PORT11, PORT15, PORT20, PORT1, PORT2, PORT8, PORT19};
-/*YSY*//*DXBX*/int motorPreset[8] = {PORT14, PORT15, PORT18, PORT19, PORT1, PORT20, PORT5, PORT9};
+/*DYZ*//*DBCX*/int motorPreset[8] = {PORT15, PORT2, PORT16, PORT8, PORT20, PORT18, PORT5 , PORT17};
+/*YSY*//*DXBX*///int motorPreset[8] = {PORT14, PORT15, PORT18, PORT19, PORT1, PORT20, PORT5, PORT9};
 motor LeftMotor1  (motorPreset[0],    gearSetting::ratio18_1, false);
 motor LeftMotor2  (motorPreset[1],    gearSetting::ratio18_1, false);
 motor RightMotor1 (motorPreset[2],    gearSetting::ratio18_1, true);
 motor RightMotor2 (motorPreset[3],    gearSetting::ratio18_1, true);
-motor LiftMotor   (motorPreset[4],    gearSetting::ratio18_1, false);
+motor LiftMotor   (motorPreset[4],    gearSetting::ratio18_1, true);
 motor TrayMotor   (motorPreset[5],    gearSetting::ratio18_1, true);
 motor LeftIntake  (motorPreset[6],    gearSetting::ratio18_1, false);
 motor RightIntake (motorPreset[7],    gearSetting::ratio18_1, true);
-limit LimitBack   (Brain.ThreeWirePort.D);
-limit LimitDown   (Brain.ThreeWirePort.H);
+limit LimitBack   (Brain.ThreeWirePort.A);
+limit LimitDown   (Brain.ThreeWirePort.C);
 gyro Gyro         (Brain.ThreeWirePort.B);
-//line Line         (Brain.ThreeWirePort.H);
+line Line         (Brain.ThreeWirePort.H);
 
 vex::competition Competition;
 
@@ -64,7 +64,7 @@ void pre_auton( void ) {
   while(true){
     double cur = GyroGetAngle();
     double cur1 = LeftMotor2.rotation(deg);
-    double cur2 = RightMotor2.rotation(deg);
+    double cur2 = Line.value(pct);
     Brain.Screen.setPenColor(vex::color::cyan);
     Brain.Screen.setFont(vex::fontType::mono30);
     Brain.Screen.printAt(400, 23, "%f", cur);
@@ -177,7 +177,10 @@ void drivercontrol( void ) {
       else  Lift(-100);
     }
     else{
-      if(LiftDown && !LimitDown.pressing()) Lift(-10); 
+      if(LiftDown && !LimitDown.pressing()){
+        if(fabs(TrayMotor.rotation(deg)) > 360) Lift(0);
+        else  Lift(-10); 
+      }
       else  Lift(0);
     }
 

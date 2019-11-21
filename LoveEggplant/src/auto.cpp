@@ -34,7 +34,7 @@ void runAuto(){
 }
 
 void auto1(){//Blue small with eight tubes
-  spread();
+  spread(false);
   sleep(350);
   Lift(-15);
   LeftMotor1.resetRotation();
@@ -104,7 +104,7 @@ STOP:
 }
 
 void auto2(){ //Blue Big 8
-  spread();
+  spread(false);
   Intake(0);
   if(!rushForward(50, 630, 2000)) goto STOP;
   turnRightWithGyroL(40, 30.2, 1000, true, 0.6, 0.0, 1);
@@ -154,7 +154,7 @@ STOP:
 }
 
 void auto3(){ // blue big 7
-  spread();
+  spread(false);
   Intake(0);
   if(!rushForward(50, 630, 2000)) goto STOP;
   turnRightWithGyroL(40, 30.2, 1000, true, 0.6, 0.0, 1);
@@ -208,7 +208,7 @@ void auto4(){
 }
 
 void auto5(){//Red small with eight tubes
-  spread();
+  spread(false);
   sleep(350);
   Lift(-15);
   LeftMotor1.resetRotation();
@@ -273,7 +273,7 @@ STOP:
 }
 
 void auto6(){//red Big 8
-  spread();
+  spread(false);
   Intake(0);
   if(!rushForward(50, 630, 2000)) goto STOP;
   turnLeftWithGyroR(40, -30.2, 1000, true, 0.6, 0.0, 1);
@@ -332,52 +332,47 @@ void auto8(){
 void autoTest(){
   timer T1;
   T1.clear();
-  spread();
+  spread(true);
+  sleep(500);
   Lift(-15);
-  rushForward(90, 180, 1500, true);
-  rushForward(27, 570, 3500, false);
+  rushForward(22, 860, 6000, false);
   Stop(hold);
+  while(Line.value(pct) > 40){
+    sleep(10);
+  }
+  sleep(300);
+  Intake(0);
   Lift(0);
-  while(GyroGetAngle() < 50.7){
-    LeftMotor1.spin(fwd, 58 - GyroGetAngle(), rpm);//62
-    LeftMotor2.spin(fwd, 58 - GyroGetAngle(), rpm);
-    RightMotor1.stop(hold);
-    RightMotor2.stop(hold);
+  while(GyroGetAngle() > -180){
+    if(GyroGetAngle() > -115)  sMove(-20, 20);
+    else sMove(-5, 5);
+    sleep(10);
   }
   Stop(hold);
-  if(!rushBackward(100, -600, 3000, true))  goto STOP;
-  Move(-50, -50);
-  sleep(200);
-  Move(-70, -30);
-  sleep(500);
-  Move(-20, -20);
-  sleep(15);
-  Stop();
-  goto STOP;
-  rushForward(86, 150, 1500, true);
-  rushForward(22, 710, 4400, false);
-  Stop(hold);
-  Lift(0);
-  Intake(0, hold);
-  TrayMotor.startRotateTo(560, deg);
-  turnLeftWithGyro(100, -170.0, 1550, false, 0.39, 0.0, 0.42);
-  rushForward(100, 300, 1800, true);
+  rushForward(70, 150, 1800, true);
   rushForward(60, 220, 1500, false);
+  Intake(0);
   Move(40, 40);
   sleep(50);
   Move(-10, -10);
   sleep(100);
   Stop();
   Move(5, 5);
-  Tray(80, coast, 750);
-  Tray(75, coast, 800);
-  Tray(70, coast, 1100);
+  Tray(70, coast, 750);
+  Tray(60, coast, 800);
+  Tray(50, coast, 1100);
   Tray(35);
-  Move(15, 15);
+  sleep(200);
+  Move(40, 40);
   sleep(400);
+  Tray(0, hold);
+  Move(0, 0);
+  sleep(700);
   Tray(0, coast);
   Move(-50, -50);
+  LeftMotor1.resetRotation();
   while(T1.time(msec) < 15500){
+    if(fabs(LeftMotor1.rotation(deg)) > 500)  break;
     sleep(5);
   }
   Stop(coast);
@@ -388,3 +383,62 @@ STOP:
   Lift(0);
   return;
 }
+
+
+// timer T1;
+//   T1.clear();
+//   spread();
+//   Lift(-15);
+//   rushForward(90, 180, 1500, true);
+//   rushForward(27, 570, 3500, false);
+//   Stop(hold);
+//   Lift(0);
+//   while(GyroGetAngle() < 50.7){
+//     LeftMotor1.spin(fwd, 59 - GyroGetAngle(), rpm);//62
+//     LeftMotor2.spin(fwd, 59 - GyroGetAngle(), rpm);
+//     RightMotor1.stop(hold);
+//     RightMotor2.stop(hold);
+//   }
+//   Stop(hold);
+//   if(!rushBackward(100, -600, 3000, true))  goto STOP;
+//   Move(-50, -50);
+//   sleep(200);
+//   Move(-70, -30);
+//   sleep(500);
+//   Move(-20, -20);
+//   sleep(400);
+//   Stop();
+//   rushForward(86, 150, 1500, true);
+//   rushForward(22, 710, 4400, false);
+//   Stop(hold);
+//   sleep(500);
+//   Lift(0);
+//   Intake(0, hold);
+//   TrayMotor.startRotateTo(560, deg);
+//   turnLeftWithGyro(100, -170.0, 1550, false, 0.39, 0.0, 0.42);
+//   rushForward(100, 300, 1800, true);
+//   rushForward(60, 220, 1500, false);
+//   Move(40, 40);
+//   sleep(50);
+//   Move(-10, -10);
+//   sleep(100);
+//   Stop();
+//   Move(5, 5);
+//   Tray(80, coast, 750);
+//   Tray(75, coast, 800);
+//   Tray(70, coast, 1100);
+//   Tray(35);
+//   Move(15, 15);
+//   sleep(400);
+//   Tray(0, coast);
+//   Move(-50, -50);
+//   while(T1.time(msec) < 15500){
+//     sleep(5);
+//   }
+//   Stop(coast);
+// STOP:
+//   Intake(0);
+//   Stop(coast);
+//   Tray(0, coast);
+//   Lift(0);
+//   return;

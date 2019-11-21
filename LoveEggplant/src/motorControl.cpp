@@ -126,7 +126,11 @@ void Intake(float power, brakeType type){
 }
 
 //////////////////////AUTO CONTROL////////////////////////
-void spread(){
+void spread(bool preload){
+  if(preload){
+    rushForward(40, 160, 1000);
+    rushBackward(50, -120, 1000);
+  }
   Intake(50);
   sleep(200);
   Intake(0);
