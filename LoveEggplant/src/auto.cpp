@@ -329,7 +329,7 @@ void auto8(){
   
 }
 
-void autoTest(){
+void autoTest(){  //blue small 5
   timer T1;
   T1.clear();
   spread(true);
