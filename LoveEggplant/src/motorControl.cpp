@@ -146,6 +146,24 @@ void spread(bool preload){
   sleep(100);
 }
 
+int locateCube(){
+  Intake(100);
+  timer cubeTime;
+  cubeTime.clear();
+  while(Line.value(pct) > 40 && LimitBack.pressing() && cubeTime.time(msec) < 5000){
+    sleep(10);
+  }
+  RightIntake.resetRotation();
+  while(RightIntake.rotation(deg) < 250){
+    sleep(10);
+  }
+  Intake(0);
+  LeftIntake.stop();
+  TrayMotor.setVelocity(40, pct);
+  TrayMotor.startRotateTo(370, deg);
+  return 0;
+}
+
 bool goForward(int power, float target, float timeLimit, float P, float I, float D){
 	float errL = 0.0;
   float errR = 0.0;
@@ -410,7 +428,7 @@ bool turnRight(int power, float target, float timeLimit, float P, float I, float
     voltR = voltR * acc;
 
     float rpmAdjust = 0.0 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm));// * (curL / target)
-		float rotationAdjust = 0 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg));// * (curL / target)
+		float rotationAdjust = 0.0 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg));// * (curL / target)
     Move(CONSTRAIN(voltL - rpmAdjust - rotationAdjust, -power, power),
          CONSTRAIN(voltR + rpmAdjust + rotationAdjust, -power, power));
 
@@ -472,6 +490,9 @@ bool turnLeftWithGyro(int power, float target, float timeLimit, bool fullTime, f
       else        OUT = -(power * 0.1);
     }
 
+    float acc = CONSTRAIN(Brain.timer(msec) / 1000, 0, 1);
+    OUT = OUT * acc;
+
     sMove(CONSTRAIN(OUT, -power, power),
           CONSTRAIN(-OUT, -power, power));
 
@@ -503,6 +524,9 @@ bool turnRightWithGyro(int power, float target, float timeLimit, bool fullTime, 
       if(OUT > 0) OUT = power * 0.1;
       else        OUT = -(power * 0.1);
     }
+
+    float acc = CONSTRAIN(Brain.timer(msec) / 1000, 0, 1);
+    OUT = OUT * acc;
 
     sMove(CONSTRAIN(OUT, -power, power),
           CONSTRAIN(-OUT, -power, power));

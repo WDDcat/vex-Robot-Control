@@ -18,27 +18,30 @@ using namespace vex;
 brain Brain;
 controller Controller = controller();
 //PeiLianChe   //12 13 15 14 8 19 9 5 F E C
+triport::port a = Brain.ThreeWirePort.A;
 
-/*WSF*//*AFCH*///int motorPreset[8] = {PORT3, PORT15, PORT7, PORT6, PORT4, PORT10, PORT11, PORT14};
-/*DYZ*//*DBCX*/int motorPreset[8] = {PORT15, PORT2, PORT16, PORT8, PORT20, PORT18, PORT5 , PORT17};
-/*YSY*//*DXBX*///int motorPreset[8] = {PORT14, PORT15, PORT18, PORT19, PORT1, PORT20, PORT5, PORT9};
+/*PLC*///int motorPreset[8] = {PORT12, PORT13, PORT15, PORT14, PORT8, PORT19, PORT9, PORT5};  triport::port triPreset[4] = {Brain.ThreeWirePort.F, Brain.ThreeWirePort.A, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C}; bool liftB = false;
+/*WSF*///int motorPreset[8] = {PORT3, PORT15, PORT19, PORT1, PORT11, PORT10, PORT12, PORT18}; triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C, Brain.ThreeWirePort.H}; bool liftB = false;
+/*DYZ*/int motorPreset[8] = {PORT15, PORT3, PORT17, PORT7, PORT20, PORT5, PORT10, PORT2};    triport::port triPreset[4] = {Brain.ThreeWirePort.A, Brain.ThreeWirePort.C, Brain.ThreeWirePort.B, Brain.ThreeWirePort.H}; bool liftB = true;
+/*YSY*///int motorPreset[8] = {PORT15, PORT12, PORT18, PORT16, PORT1, PORT19, PORT8, PORT17};  triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.C, Brain.ThreeWirePort.B, Brain.ThreeWirePort.H}; bool liftB = false;
+/*SHN*///int motorPreset[8] = {PORT12, PORT11, PORT10, PORT20, PORT6, PORT5, PORT1, PORT3};   triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.H, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C}; bool liftB = false; 
 motor LeftMotor1  (motorPreset[0],    gearSetting::ratio18_1, false);
 motor LeftMotor2  (motorPreset[1],    gearSetting::ratio18_1, false);
 motor RightMotor1 (motorPreset[2],    gearSetting::ratio18_1, true);
 motor RightMotor2 (motorPreset[3],    gearSetting::ratio18_1, true);
-motor LiftMotor   (motorPreset[4],    gearSetting::ratio18_1, true);
+motor LiftMotor   (motorPreset[4],    gearSetting::ratio18_1, liftB);
 motor TrayMotor   (motorPreset[5],    gearSetting::ratio18_1, true);
 motor LeftIntake  (motorPreset[6],    gearSetting::ratio18_1, false);
 motor RightIntake (motorPreset[7],    gearSetting::ratio18_1, true);
-limit LimitBack   (Brain.ThreeWirePort.A);
-limit LimitDown   (Brain.ThreeWirePort.C);
-gyro Gyro         (Brain.ThreeWirePort.B);
-line Line         (Brain.ThreeWirePort.H);
+limit LimitBack   (triPreset[0]);
+limit LimitDown   (triPreset[1]);
+gyro Gyro         (triPreset[2]);
+line Line         (triPreset[3]);
 
 vex::competition Competition;
 
 // define your global instances of motors and other devices here
-int auton = -1;
+int auton = 7;
 bool initComplete = false;
 
 /*---------------------------------------------------------------------------*/
@@ -70,7 +73,9 @@ void pre_auton( void ) {
     Brain.Screen.printAt(400, 23, "%f", cur);
     Brain.Screen.printAt(400, 47, "%f", cur1);
     Brain.Screen.printAt(400, 71, "%f", cur2);
-    onClickListener();
+    // LeftMotor1.spin(fwd, 1, voltageUnits::mV);
+    // LeftMotor2.spin(fwd, 100, pct);
+    // onClickListener();
   }
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
@@ -88,6 +93,7 @@ void pre_auton( void ) {
 
 void autonomous( void ) {
   runAuto();
+  // auto7();
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
@@ -107,7 +113,7 @@ void drivercontrol( void ) {
   // User control code here, inside the loop
   int Ch1, Ch2, Ch3, Ch4;
   bool L1, L2, R1, R2, BtnA, BtnB, BtnX, BtnY, BtnU, BtnD, BtnL, BtnR;
-  bool LiftDown = true;
+  bool LiftDown = false;
   while (1) {
     Ch1 = Controller.Axis1.value();
     Ch2 = Controller.Axis2.value();
@@ -141,11 +147,11 @@ void drivercontrol( void ) {
     //Tray control
     if(Ch2 > 15){
       R1 = false;
-      if(fabs(TrayMotor.rotation(deg)) < 360){//360
-        Tray(Ch2*0.6);//0.6
+      if(fabs(TrayMotor.rotation(deg)) < 520){//360
+        Tray(Ch2 * 0.9);//0.6
       }
       else{
-        Tray(Ch2 * 0.3);//0.3
+        Tray(Ch2 * 0.35);//0.3
       }
     }
     else if(Ch2 < -15){
@@ -165,6 +171,7 @@ void drivercontrol( void ) {
     // Lift control
     if(L1){
       if(TrayMotor.rotation(deg) < 385)  Tray(100);
+      LiftMotor.setMaxTorque(2, Nm);
       Lift(100);
       LiftDown = false;
     }
@@ -177,19 +184,16 @@ void drivercontrol( void ) {
       else  Lift(-100);
     }
     else{
-      if(LiftDown && !LimitDown.pressing()){
-        if(fabs(TrayMotor.rotation(deg)) > 360) Lift(0);
-        else  Lift(-10); 
-      }
-      else  Lift(0);
+      if(LiftDown && !LimitDown.pressing() && TrayMotor.rotation(deg) < 200)   Lift(-5);
+      else Lift(0);
     }
 
     //Intake control
     if(R1) Intake(100);
     else if(R2) Intake(-100);
-    else        Intake(1);
+    else        Intake(0);
 
-    onClickListener();
+    // onClickListener();
 
     sleep(20); //Sleep the task for a short amount of time to prevent wasted resources. 
   }
