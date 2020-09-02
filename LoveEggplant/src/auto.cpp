@@ -7,7 +7,7 @@
 extern int auton;
 
 void runAuto(){
-  while (!GyroGetValid()) sleep(10);
+  
   switch(auton){
   case -1:
     autoTest(); break;
@@ -16,7 +16,7 @@ void runAuto(){
   case 2:
     auto2();  break;
   case 3:
-    auto3();  break;
+    Blue();   break;
   case 4:
     auto4();  break;
   case 5:
@@ -24,7 +24,7 @@ void runAuto(){
   case 6:
     auto6();  break;
   case 7:
-    auto7();  break;
+    break;
   case 8:
     auto8();  break;
   default:

@@ -21,10 +21,13 @@ controller Controller = controller();
 triport::port a = Brain.ThreeWirePort.A;
 
 /*PLC*///int motorPreset[8] = {PORT12, PORT13, PORT15, PORT14, PORT8, PORT19, PORT9, PORT5};  triport::port triPreset[4] = {Brain.ThreeWirePort.F, Brain.ThreeWirePort.A, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C}; bool liftB = false;
-/*WSF*///int motorPreset[8] = {PORT3, PORT15, PORT19, PORT1, PORT11, PORT10, PORT12, PORT18}; triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C, Brain.ThreeWirePort.H}; bool liftB = false;
-/*DYZ*/int motorPreset[8] = {PORT15, PORT3, PORT17, PORT7, PORT20, PORT5, PORT10, PORT2};    triport::port triPreset[4] = {Brain.ThreeWirePort.A, Brain.ThreeWirePort.C, Brain.ThreeWirePort.B, Brain.ThreeWirePort.H}; bool liftB = true;
+/*WSF*///int motorPreset[8] = {PORT3, PORT15, PORT19, PORT1, PORT11, PORT10, PORT14, PORT18}; triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C, Brain.ThreeWirePort.H}; bool liftB = false;
+/*DYZ*///int motorPreset[8] = {PORT13, PORT14, PORT20, PORT19, PORT15, PORT16, PORT5, PORT6};    triport::port triPreset[4] = {Brain.ThreeWirePort.A, Brain.ThreeWirePort.C, Brain.ThreeWirePort.B, Brain.ThreeWirePort.H}; bool liftB = true;
 /*YSY*///int motorPreset[8] = {PORT15, PORT12, PORT18, PORT16, PORT1, PORT19, PORT8, PORT17};  triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.C, Brain.ThreeWirePort.B, Brain.ThreeWirePort.H}; bool liftB = false;
-/*SHN*///int motorPreset[8] = {PORT12, PORT11, PORT10, PORT20, PORT6, PORT5, PORT1, PORT3};   triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.H, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C}; bool liftB = false; 
+/*SHN*///int motorPreset[8] = {PORT12, PORT11, PORT10, PORT21, PORT6, PORT5, PORT1, PORT3};   triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.H, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C}; bool liftB = false;
+/*2020*/int motorPreset[8] = {PORT13, PORT12, PORT18, PORT20, PORT5, PORT16, PORT11, PORT1};   triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.H, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C}; bool liftB = false; 
+
+
 motor LeftMotor1  (motorPreset[0],    gearSetting::ratio18_1, false);
 motor LeftMotor2  (motorPreset[1],    gearSetting::ratio18_1, false);
 motor RightMotor1 (motorPreset[2],    gearSetting::ratio18_1, true);
@@ -35,13 +38,14 @@ motor LeftIntake  (motorPreset[6],    gearSetting::ratio18_1, false);
 motor RightIntake (motorPreset[7],    gearSetting::ratio18_1, true);
 limit LimitBack   (triPreset[0]);
 limit LimitDown   (triPreset[1]);
-gyro Gyro         (triPreset[2]);
-line Line         (triPreset[3]);
+gyro Gyro         (triPreset[3]);
+line Line         (triPreset[2]);
+inertial Inertial (PORT15);
 
 vex::competition Competition;
 
 // define your global instances of motors and other devices here
-int auton = 7;
+int auton = 3;
 bool initComplete = false;
 
 /*---------------------------------------------------------------------------*/
@@ -59,23 +63,36 @@ void pre_auton( void ) {
   RightIntake.setBrake(coast);
   ResetMotor();
   
-  gyroInit();
+  // gyroInit();
   task setGyro(GyroTask);
-  initComplete = true;
+  Inertial.calibrate();
+  while(Inertial.isCalibrating()){  sleep(10);}
+  Inertial.resetHeading();
+  Inertial.resetRotation();
 
-  activity_loading("7258A", false);
+  // activity_loading("7258B", false);
+  
+  initComplete = true;
+  timer lineTimer;
+  lineTimer.reset();
   while(true){
-    double cur = GyroGetAngle();
-    double cur1 = LeftMotor2.rotation(deg);
-    double cur2 = Line.value(pct);
+    double cur = Inertial.pitch();//x轴方向角 （原点看向轴方向）顺时针为负
+    double cur1 = Inertial.yaw();//z轴方向角  
+    double cur2 = Inertial.roll();//y轴方向角
+    cur = Inertial.angle();
+    cur1 = GyroGetAngle();
+    cur2 = Inertial.rotation();
     Brain.Screen.setPenColor(vex::color::cyan);
     Brain.Screen.setFont(vex::fontType::mono30);
     Brain.Screen.printAt(400, 23, "%f", cur);
     Brain.Screen.printAt(400, 47, "%f", cur1);
     Brain.Screen.printAt(400, 71, "%f", cur2);
-    // LeftMotor1.spin(fwd, 1, voltageUnits::mV);
-    // LeftMotor2.spin(fwd, 100, pct);
-    // onClickListener();
+    // double lineValue = Line.value(pct);
+    // if(lineValue < linemin) linemin = lineValue;
+    // if(lineValue > linemax) linemax = lineValue;
+    // Brain.Screen.drawCircle(lineTimer.time(msec) / 10, (SCREEN_MAX_HEIGHT - lineValue), 2);
+    // Brain.Screen.printAt(400, 23, "%f", linemin);
+    // Brain.Screen.printAt(400, 47, "%f", linemax);
   }
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
@@ -92,8 +109,9 @@ void pre_auton( void ) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous( void ) {
-  runAuto();
-  // auto7();
+  while (!GyroGetValid()) sleep(10);
+  // runAuto();
+  Blue();
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
@@ -113,7 +131,6 @@ void drivercontrol( void ) {
   // User control code here, inside the loop
   int Ch1, Ch2, Ch3, Ch4;
   bool L1, L2, R1, R2, BtnA, BtnB, BtnX, BtnY, BtnU, BtnD, BtnL, BtnR;
-  bool LiftDown = false;
   while (1) {
     Ch1 = Controller.Axis1.value();
     Ch2 = Controller.Axis2.value();
@@ -144,54 +161,74 @@ void drivercontrol( void ) {
     }
     else Stop(coast);
 
-    //Tray control
-    if(Ch2 > 15){
-      R1 = false;
-      if(fabs(TrayMotor.rotation(deg)) < 520){//360
-        Tray(Ch2 * 0.9);//0.6
-      }
-      else{
-        Tray(Ch2 * 0.35);//0.3
-      }
-    }
-    else if(Ch2 < -15){
-      if(LimitBack.pressing()){
-        TrayMotor.resetRotation();
-        Tray(0, hold);
-      }
-      else{
-        Tray(Ch2);
-      }
-    }
-    else{
-      if(LimitBack.pressing())  Tray(0, hold);
-      else  Tray(0, brake);
-    }
+    // //Tray control
+    // if(Ch2 > 15){
+    //   R1 = false;
+    //   if(fabs(TrayMotor.rotation(deg)) < 520){//360
+    //     Tray(Ch2 * 0.9);//0.6
+    //   }
+    //   else{
+    //     Tray(Ch2 * 0.33);//0.3
+    //   }
+    // }
+    // else if(Ch2 < -15){
+    //   if(LimitBack.pressing()){
+    //     TrayMotor.resetRotation();
+    //     Tray(0, hold);
+    //   }
+    //   else{
+    //     Tray(Ch2);
+    //   }
+    // }
+    // else{
+    //   if(LimitBack.pressing())  Tray(0, hold);
+    //   else  Tray(0, brake);
+    // }
 
-    // Lift control
-    if(L1){
-      if(TrayMotor.rotation(deg) < 385)  Tray(100);
-      LiftMotor.setMaxTorque(2, Nm);
-      Lift(100);
-      LiftDown = false;
-    }
-    else if(L2){
-      if(LimitDown.pressing()){
-        LiftDown = true;
-        Lift(0);
-        LiftMotor.resetRotation();
-      }
-      else  Lift(-100);
-    }
-    else{
-      if(LiftDown && !LimitDown.pressing() && TrayMotor.rotation(deg) < 200)   Lift(-5);
-      else Lift(0);
-    }
+    // // Lift control
+    // if(L1){
+    //   if(TrayMotor.rotation(deg) < 385)  Tray(100);
+    //   LiftMotor.setMaxTorque(2, Nm);
+    //   Lift(100);
+    //   LiftDown = false;
+    // }
+    // else if(L2){
+    //   if(LimitDown.pressing()){
+    //     LiftDown = true;
+    //     Lift(0);
+    //     LiftMotor.resetRotation();
+    //   }
+    //   else  Lift(-100);
+    // }
+    // else{
+    //   if(LiftDown && !LimitDown.pressing() && TrayMotor.rotation(deg) < 200)   Lift(-5);
+    //   else Lift(0);
+    // }
 
     //Intake control
-    if(R1) Intake(100);
-    else if(R2) Intake(-100);
-    else        Intake(0);
+    if(L1) {
+      TrayMotor.spin(fwd, -100, pct);
+    }
+    else if(L2) {
+      TrayMotor.spin(fwd, 100, pct);
+    }
+    else {
+      TrayMotor.spin(fwd, 0, pct);
+    }
+
+
+    if(R1) {
+      Intake(100);
+      LiftMotor.spin(fwd, -100, pct);
+    }
+    else if(R2) {
+      Intake(-100);
+      LiftMotor.spin(fwd, 100, pct);
+    }
+    else {
+      Intake(0, coast);
+      LiftMotor.stop(coast);
+    }
 
     // onClickListener();
 

@@ -53,6 +53,7 @@ extern limit LimitBack;
 extern limit LimitDown;
 extern gyro Gyro;
 extern line Line;
+extern inertial Inertial;
 
 extern int auton;
 

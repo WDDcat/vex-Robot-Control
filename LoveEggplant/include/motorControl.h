@@ -3,7 +3,7 @@ void ResetMotor();
 void Move(float lPower, float rPower);
 void sMove(float lPower, float rPower);
 void Stop(vex::brakeType type = vex::brake);
-void Lift(int power);
+void Lift(int power, vex::brakeType type = vex::hold);
 void Tray(float power, vex::brakeType type = vex::brake, float rotation = 0.0);
 void Intake(float power, vex::brakeType type = vex::brake);
 

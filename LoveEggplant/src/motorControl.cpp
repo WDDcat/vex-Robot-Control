@@ -87,7 +87,7 @@ void Stop(brakeType type){
   RightMotor2.stop(type);
 }
 
-void Lift(int power){
+void Lift(int power, brakeType type){
   if(power == 0){
     LiftMotor.stop(hold);
   }
@@ -139,7 +139,7 @@ void spread(bool preload){
     Tray(-100);
   }
   TrayMotor.resetRotation();
-  Tray(-20);
+  Tray(-40);
   sleep(100);
   Tray(0, hold);
   Intake(100);
@@ -147,20 +147,30 @@ void spread(bool preload){
 }
 
 int locateCube(){
+  int num = 0;
   Intake(100);
   timer cubeTime;
   cubeTime.clear();
-  while(Line.value(pct) > 40 && LimitBack.pressing() && cubeTime.time(msec) < 5000){
+  while(num < 4 && LimitBack.pressing()){// && cubeTime.time(msec) < 10000){
     sleep(10);
+    if(Line.value(pct) < 20){
+      while(Line.value(pct) < 40){
+        sleep(10);
+      }
+      num++;
+    }
+    
+    Brain.Screen.printAt(400, 71, "%f", num);
   }
   RightIntake.resetRotation();
   while(RightIntake.rotation(deg) < 250){
     sleep(10);
   }
+  sleep(150);
   Intake(0);
   LeftIntake.stop();
   TrayMotor.setVelocity(40, pct);
-  TrayMotor.startRotateTo(370, deg);
+  TrayMotor.startRotateTo(350, deg);
   return 0;
 }
 

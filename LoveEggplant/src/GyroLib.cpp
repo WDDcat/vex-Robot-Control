@@ -25,7 +25,7 @@ int GyroTask() {
     nSysTimeOffset = Brain.Timer.time();
 
     while (true) {
-        gyro_value = Gyro.value(vex::analogUnits::mV);
+        gyro_value = Inertial.rotation();//Gyro.value(vex::analogUnits::mV);
 
         if (Brain.Timer.time() - nSysTimeOffset > 250) {
             if (fabs(gyro_value - lastDriftGyro) < 3) {
@@ -34,7 +34,7 @@ int GyroTask() {
             lastDriftGyro = gyro_value;
             nSysTimeOffset = Brain.Timer.time();
         }
-        angle = (gyro_value + gyro_error)  / 10.0;
+        angle = (gyro_value + gyro_error);//  / 10.0;
 
         // normalize into the range 0 - 360
         //if( angle < 0 ) angle += 360;
