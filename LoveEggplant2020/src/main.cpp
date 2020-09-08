@@ -17,30 +17,32 @@ using namespace vex;
 
 brain Brain;
 controller Controller = controller();
-//PeiLianChe   //12 13 15 14 8 19 9 5 F E C
-triport::port a = Brain.ThreeWirePort.A;
 
-/*PLC*///int motorPreset[8] = {PORT12, PORT13, PORT15, PORT14, PORT8, PORT19, PORT9, PORT5};  triport::port triPreset[4] = {Brain.ThreeWirePort.F, Brain.ThreeWirePort.A, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C}; bool liftB = false;
-/*WSF*///int motorPreset[8] = {PORT3, PORT15, PORT19, PORT1, PORT11, PORT10, PORT14, PORT18}; triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C, Brain.ThreeWirePort.H}; bool liftB = false;
-/*DYZ*///int motorPreset[8] = {PORT13, PORT14, PORT20, PORT19, PORT15, PORT16, PORT5, PORT6};    triport::port triPreset[4] = {Brain.ThreeWirePort.A, Brain.ThreeWirePort.C, Brain.ThreeWirePort.B, Brain.ThreeWirePort.H}; bool liftB = true;
-/*YSY*///int motorPreset[8] = {PORT15, PORT12, PORT18, PORT16, PORT1, PORT19, PORT8, PORT17};  triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.C, Brain.ThreeWirePort.B, Brain.ThreeWirePort.H}; bool liftB = false;
-/*SHN*///int motorPreset[8] = {PORT12, PORT11, PORT10, PORT21, PORT6, PORT5, PORT1, PORT3};   triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.H, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C}; bool liftB = false;
-/*2020 99999v*///int motorPreset[8] = {PORT13, PORT12, PORT18, PORT20, PORT5, PORT16, PORT11, PORT1};   triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.H, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C}; bool liftB = false; 
-/*2020 王老师idea*/int motorPreset[8] = {PORT13, PORT12, PORT18, PORT20, PORT5, PORT16, PORT11, PORT1};   triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.H, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C}; bool liftB = false; 
+/*PLC*///int motorPreset[8] = {PORT12, PORT13, PORT15, PORT14, PORT8, PORT19, PORT9, PORT5};  triport::port triPreset[4] = {Brain.ThreeWirePort.F, Brain.ThreeWirePort.A, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C};
+/*WSF*///int motorPreset[8] = {PORT3, PORT15, PORT19, PORT1, PORT11, PORT10, PORT14, PORT18}; triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C, Brain.ThreeWirePort.H};
+/*DYZ*///int motorPreset[8] = {PORT13, PORT14, PORT20, PORT19, PORT15, PORT16, PORT5, PORT6};    triport::port triPreset[4] = {Brain.ThreeWirePort.A, Brain.ThreeWirePort.C, Brain.ThreeWirePort.B, Brain.ThreeWirePort.H};
+/*YSY*///int motorPreset[8] = {PORT15, PORT12, PORT18, PORT16, PORT1, PORT19, PORT8, PORT17};  triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.C, Brain.ThreeWirePort.B, Brain.ThreeWirePort.H};
+/*SHN*///int motorPreset[8] = {PORT12, PORT11, PORT10, PORT21, PORT6, PORT5, PORT1, PORT3};   triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.H, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C};
+/*2020 99999v*/   //int motorPreset[8] = {PORT13, PORT14, PORT20, PORT19, PORT16, PORT15, PORT5, PORT6};   triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.H, Brain.ThreeWirePort.B, Brain.ThreeWirePort.C}; 
+                  //bool motorDirection[8] = {true, true, false, false, false, false, false, true};
+/*2020 10955*/    //int motorPreset[8] = {PORT13, PORT12, PORT18, PORT20, PORT16, PORT2, PORT11, PORT1};   triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.H, Brain.ThreeWirePort.A, Brain.ThreeWirePort.C};
+                  //bool motorDirection[8] = {false, false, true, true, true, true, false, true};
+/*2020 王老师idea*/int motorPreset[8] = {PORT13, PORT12, PORT18, PORT20, PORT16, PORT2, PORT11, PORT1};   triport::port triPreset[4] = {Brain.ThreeWirePort.D, Brain.ThreeWirePort.H, Brain.ThreeWirePort.A, Brain.ThreeWirePort.C};
+                  bool motorDirection[8] = {false, false, true, true, false, true, true, false};
 
 
-motor LeftMotor1  (motorPreset[0],    gearSetting::ratio18_1, false);
-motor LeftMotor2  (motorPreset[1],    gearSetting::ratio18_1, false);
-motor RightMotor1 (motorPreset[2],    gearSetting::ratio18_1, true);
-motor RightMotor2 (motorPreset[3],    gearSetting::ratio18_1, true);
-motor LiftMotor   (motorPreset[4],    gearSetting::ratio18_1, liftB);
-motor TrayMotor   (motorPreset[5],    gearSetting::ratio18_1, true);
-motor LeftIntake  (motorPreset[6],    gearSetting::ratio18_1, false);
-motor RightIntake (motorPreset[7],    gearSetting::ratio18_1, true);
+motor LeftMotor1  (motorPreset[0],    gearSetting::ratio18_1, motorDirection[0]);
+motor LeftMotor2  (motorPreset[1],    gearSetting::ratio18_1, motorDirection[1]);
+motor RightMotor1 (motorPreset[2],    gearSetting::ratio18_1, motorDirection[2]);
+motor RightMotor2 (motorPreset[3],    gearSetting::ratio18_1, motorDirection[3]);
+motor UpperRoller (motorPreset[4],    gearSetting::ratio18_1, motorDirection[4]);
+motor LowerRoller (motorPreset[5],    gearSetting::ratio18_1, motorDirection[5]);
+motor LeftIntake  (motorPreset[6],    gearSetting::ratio18_1, motorDirection[6]);
+motor RightIntake (motorPreset[7],    gearSetting::ratio18_1, motorDirection[7]);
 limit LimitBack   (triPreset[0]);
 limit LimitDown   (triPreset[1]);
-gyro Gyro         (triPreset[3]);
 line Line         (triPreset[2]);
+gyro Gyro         (triPreset[3]);
 inertial Inertial (PORT15);
 
 vex::competition Competition;
@@ -48,6 +50,8 @@ vex::competition Competition;
 // define your global instances of motors and other devices here
 int auton = 3;
 bool initComplete = false;
+int driveMode = DRIVE_MODE_1BAR;
+timer driverTimer;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -60,6 +64,7 @@ bool initComplete = false;
 /*---------------------------------------------------------------------------*/
 
 void pre_auton( void ) {
+
   LeftIntake.setBrake(coast);
   RightIntake.setBrake(coast);
   ResetMotor();
@@ -76,18 +81,21 @@ void pre_auton( void ) {
   initComplete = true;
   timer lineTimer;
   lineTimer.reset();
+  double cur1 = 0.0, cur2 = 0.0, cur3 = 0.0;
   while(true){
-    double cur = Inertial.pitch();//x轴方向角 （原点看向轴方向）顺时针为负
-    double cur1 = Inertial.yaw();//z轴方向角  
-    double cur2 = Inertial.roll();//y轴方向角
-    cur = Inertial.angle();
-    cur1 = GyroGetAngle();
-    cur2 = Inertial.rotation();
+    // cur1 = Inertial.pitch();//x轴方向角 （原点看向轴方向）顺时针为负
+    // cur2 = Inertial.yaw();//z轴方向角  
+    // cur3 = Inertial.roll();//y轴方向角
+    // cur1 = Inertial.angle();
+    // cur2 = GyroGetAngle();
+    // cur3 = Inertial.rotation();
+    cur1 = Line.value(pct);
+    cur2 = driverTimer.time(msec);
     Brain.Screen.setPenColor(vex::color::cyan);
     Brain.Screen.setFont(vex::fontType::mono30);
-    Brain.Screen.printAt(400, 23, "%f", cur);
-    Brain.Screen.printAt(400, 47, "%f", cur1);
-    Brain.Screen.printAt(400, 71, "%f", cur2);
+    Brain.Screen.printAt(400, 23, "%f", cur1);
+    Brain.Screen.printAt(400, 47, "%f", cur2);
+    Brain.Screen.printAt(400, 71, "%f", cur3);
     // double lineValue = Line.value(pct);
     // if(lineValue < linemin) linemin = lineValue;
     // if(lineValue > linemax) linemax = lineValue;
@@ -111,11 +119,7 @@ void pre_auton( void ) {
 
 void autonomous( void ) {
   while (!GyroGetValid()) sleep(10);
-  // runAuto();
-  Blue();
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
+  runAuto();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -132,6 +136,7 @@ void drivercontrol( void ) {
   // User control code here, inside the loop
   int Ch1, Ch2, Ch3, Ch4;
   bool L1, L2, R1, R2, BtnA, BtnB, BtnX, BtnY, BtnU, BtnD, BtnL, BtnR;
+  bool lastL1;
   while (1) {
     Ch1 = Controller.Axis1.value();
     Ch2 = Controller.Axis2.value();
@@ -153,87 +158,105 @@ void drivercontrol( void ) {
     if(!initComplete) continue;
 
     //Move control
-    if(abs(Ch3) > 10 || abs(Ch4) > 10){
-      Move(Ch3 + Ch4, Ch3 - Ch4);
+    if(driveMode == DRIVE_MODE_1BAR) {
+      if(abs(Ch3) > 10 || abs(Ch4) > 10){
+        Move(Ch3 + Ch4, Ch3 - Ch4);
+      }
+      else Stop(coast);
     }
-    else if(BtnU || BtnD || BtnL || BtnR){
-      Move(20 && BtnU - 20 && BtnD + 30 && BtnR - 30 && BtnL,
-           20 && BtnU - 20 && BtnD - 30 && BtnR + 30 && BtnL);
+    else if(driveMode == DRIVE_MODE_2BAR) {
+      if(abs(Ch3) > 10 || abs(Ch1) > 10){
+        Move(Ch3 + Ch1, Ch3 - Ch1);
+      }
+      else Stop(coast);
     }
-    else Stop(coast);
+    else if(driveMode == DRIVE_MODE_TANK) {
+      if(abs(Ch3) > 10 || abs(Ch2) > 10){
+        Move(Ch3, Ch2);
+      }
+      else Stop(coast);
+    }
 
-    // //Tray control
-    // if(Ch2 > 15){
-    //   R1 = false;
-    //   if(fabs(TrayMotor.rotation(deg)) < 520){//360
-    //     Tray(Ch2 * 0.9);//0.6
-    //   }
-    //   else{
-    //     Tray(Ch2 * 0.33);//0.3
-    //   }
-    // }
-    // else if(Ch2 < -15){
-    //   if(LimitBack.pressing()){
-    //     TrayMotor.resetRotation();
-    //     Tray(0, hold);
-    //   }
-    //   else{
-    //     Tray(Ch2);
-    //   }
-    // }
-    // else{
-    //   if(LimitBack.pressing())  Tray(0, hold);
-    //   else  Tray(0, brake);
+    //Seperate intake control
+    // if(L1) { 
+    //   UpRoll(100);
+    // } 
+    // else if(L2) { 
+    //   UpRoll(-100); 
+    // } 
+    // else {
+    //   UpRoll(0, coast); 
     // }
 
-    // // Lift control
-    // if(L1){
-    //   if(TrayMotor.rotation(deg) < 385)  Tray(100);
-    //   LiftMotor.setMaxTorque(2, Nm);
-    //   Lift(100);
-    //   LiftDown = false;
+    // if(R1 && R2) {
+    //   Roll(100);
+    //   Intake(0);
     // }
-    // else if(L2){
-    //   if(LimitDown.pressing()){
-    //     LiftDown = true;
-    //     Lift(0);
-    //     LiftMotor.resetRotation();
-    //   }
-    //   else  Lift(-100);
+    // else if(R1) {
+    //   Intake(100);
+    //   LowRoll(100);
     // }
-    // else{
-    //   if(LiftDown && !LimitDown.pressing() && TrayMotor.rotation(deg) < 200)   Lift(-5);
-    //   else Lift(0);
-    // }
+    // else if(R2) { Intake(-100); LowRoll(-100); }
+    // else { Intake(0, coast); LowRoll(0, coast); }
 
-    //Intake control
+    //Unite intake control
     if(L1) {
-      TrayMotor.spin(fwd, -100, pct);
-    }
-    else if(L2) {
-      TrayMotor.spin(fwd, 100, pct);
-    }
-    else {
-      TrayMotor.spin(fwd, 0, pct);
+      if(!lastL1) {
+        driverTimer.reset();
+      }
+      Roll(100);//(120 - (driverTimer.time(msec) * 0.03)); //球道滚轮减速
+    } 
+    else if(L2) { 
+      Roll(-100); 
+      UpperRoller.resetRotation(); 
+    } 
+    else { 
+      Roll(0, coast); 
     }
 
-
-    if(R1) {
+    if(R1) { 
       Intake(100);
-      LiftMotor.spin(fwd, -100, pct);
+      if(Line.value(pct) < 50 && !L1 && !L2) {
+        driverTimer.reset();
+        UpperRoller.resetRotation();
+        Roll(40); 
+      }
+      else if(UpperRoller.rotation(deg) > 50){//if(driverTimer.time(msec) > 300) {
+        if(!L1 && !L2) {
+          Roll(0, hold); 
+        }
+      }
+      else {
+        if(!L1 && !L2) {
+          Roll(60);
+        }
+      }
     }
-    else if(R2) {
-      Intake(-100);
-      LiftMotor.spin(fwd, 100, pct);
-    }
-    else {
-      Intake(0, coast);
-      LiftMotor.stop(coast);
-    }
+    else if(R2) { Intake(-100); }
+    else { Intake(0, coast); }
 
     // onClickListener();
 
+    if(BtnA && BtnX) {
+      while(Controller.ButtonA.pressing() && Controller.ButtonX.pressing()){
+        Controller.Screen.print("      ");
+      }
+      if(driveMode == DRIVE_MODE_1BAR) {
+        driveMode = DRIVE_MODE_2BAR;
+        Controller.Screen.print("2bar");
+      }
+      else if(driveMode == DRIVE_MODE_2BAR) {
+        driveMode = DRIVE_MODE_TANK;
+        Controller.Screen.print("tank");
+      }
+      else if(driveMode == DRIVE_MODE_TANK) {
+        driveMode = DRIVE_MODE_1BAR;
+        Controller.Screen.print("1bar");
+      }
+    } 
+
     sleep(20); //Sleep the task for a short amount of time to prevent wasted resources. 
+    lastL1 = L1;
   }
 }
 

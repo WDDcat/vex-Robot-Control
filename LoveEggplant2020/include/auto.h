@@ -1,0 +1,10 @@
+void runAuto();
+void autoTest();
+void auto1();
+void auto2();
+void auto3();
+void auto4();
+void auto5();
+void auto6();
+void auto7();
+void auto8();
