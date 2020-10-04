@@ -1,0 +1,22 @@
+void gyroInit();
+void ResetMotor();
+void Move(float lPower, float rPower);
+void sMove(float lPower, float rPower);
+void Stop(vex::brakeType type = vex::brake);
+void LowRoll(float power, vex::brakeType type = vex::coast);
+void UpRoll(float power, vex::brakeType type = vex::coast);
+void Roll(float power, vex::brakeType type = vex::coast);
+void Intake(float power, vex::brakeType type = vex::brake);
+
+bool goForward(int power, float target, float timeLimit, float P = 0.6, float I = 0.007, float D = 4.0);
+bool goBackward(int power, float target, float timeLimit, float P = 0.6, float I = 0.007, float D = 4.0);
+bool rushForward(int power, float target, float timeLimit, bool acc = false);
+bool rushBackward(int power, float target, float timeLimit, bool acc = false);
+bool turnLeft(int power, float target, float timeLimit, float P = 0.6, float I = 0.007, float D = 4.0);
+bool turnRight(int power, float target, float timeLimit, float P = 0.6, float I = 0.007, float D = 4.0);
+bool rushLeft(int power, float target, float timeLimit);
+bool rushRight(int power, float target, float timeLimit);
+bool turnLeftWithGyro(int power, float target, float timeLimit, bool fullTime, float P = 0.33, float I = 0.0001, float D = 1.25);
+bool turnRightWithGyro(int power, float target, float timeLimit, bool fullTime, float P = 0.33, float I = 0.0001, float D = 1.25);
+bool rushLeftWithGyro(int power, float target, float timeLimit);
+bool rushRightWithGyro(int power, float target, float timeLimit);
