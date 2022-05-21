@@ -7,7 +7,7 @@ void gyroInit(){
   Brain.Screen.setPenColor(vex::color::cyan);
   Brain.Screen.setFont(vex::fontType::mono40);
   Brain.Screen.printAt(80, 136, "Initializing...");
-      Gyro.startCalibration();
+    Gyro.startCalibration();
     while(Gyro.isCalibrating()){
       sleep(1);
     }
@@ -59,13 +59,6 @@ void ResetMotor(){
   RightMotor2.setVelocity(0, pct);
 }
 
-// void Move(int lPower, int rPower){
-//   LeftMotor1.spin(fwd, lPower, pct);
-//   LeftMotor2.spin(fwd, lPower, pct);
-//   RightMotor1.spin(fwd, rPower, pct);
-//   RightMotor2.spin(fwd, rPower, pct);
-// }
-
 void Move(float lPower, float rPower){
   LeftMotor1.spin(fwd, 0.128 * lPower, voltageUnits::volt);
   LeftMotor2.spin(fwd, 0.128 * lPower, voltageUnits::volt);
@@ -106,8 +99,8 @@ void LowRoll(float power, brakeType type){
 }
 
 void Roll(float power, brakeType type){
-  LowRoll(power * 0.66);
-  UpRoll(power * 0.66);
+  LowRoll(power, type);
+  UpRoll(power, type);
 }
 
 void Intake(float power, brakeType type){
@@ -159,8 +152,8 @@ bool goForward(int power, float target, float timeLimit, float P, float I, float
 
     float rpmAdjust = 0.0 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm));// * (curL / target)
 		float rotationAdjust = 0 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg));// * (curL / target)
-    Move(CONSTRAIN(voltL - rpmAdjust - rotationAdjust, -power, power),
-         CONSTRAIN(voltR + rpmAdjust + rotationAdjust, -power, power));
+    Move(CONSTRAIN(voltL, -power, power),
+         CONSTRAIN(voltR, -power, power));
 
     last_errL = errL;
     last_errR = errR;
@@ -258,130 +251,6 @@ bool rushBackward(int power, float target, float timeLimit, bool acc){
   return false;
 }
 
-bool turnLeft(int power, float target, float timeLimit, float P, float I, float D){
-  float errL = 0.0;
-  float errR = 0.0;
-	float last_errL = 0.0;
-  float last_errR = 0.0;
-  float total_errL = 0.0;
-  float total_errR = 0.0;
-	float delta_errL = 0.0;
-  float delta_errR = 0.0;
-	float voltL = 0.0;
-  float voltR = 0.0;
-  ResetMotor();
-  Brain.resetTimer();
-	while(Brain.timer(msec) < timeLimit){
-    float curL = LeftMotor2.rotation(deg);
-    float curR = RightMotor2.rotation(deg);
-    errL = - target - curL;
-    errR = target - curR;
-    if(curL / target > KI_START_PERCENT)  total_errL += errL;
-    if(curR / target > KI_START_PERCENT)  total_errR += errR;
-    delta_errL = errL - last_errL;
-    delta_errR = errR - last_errR;
-    if(errL > -1 || errR < 1){
-      sMove(0,0);
-      Move(0,0);
-      return true;
-    }
-
-    voltL = KP * errL + KI * total_errL + KD * delta_errL;
-    voltR = KP * errR + KI * total_errR + KD * delta_errR;
-
-    float acc = CONSTRAIN(Brain.timer(msec) / 1000, 0, 1);
-    voltL = voltL * acc;
-    voltR = voltR * acc;
-
-    float rpmAdjust = 0.0 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm));// * (curL / target)
-		float rotationAdjust = 0 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg));// * (curL / target)
-    Move(CONSTRAIN(voltL - rpmAdjust - rotationAdjust, -power, power),
-         CONSTRAIN(voltR + rpmAdjust + rotationAdjust, -power, power));
-
-    last_errL = errL;
-    last_errR = errR;
-		
-		sleep(10);
-	}
-  Stop(hold);
-  return false;
-}
-
-bool turnRight(int power, float target, float timeLimit, float P, float I, float D){
-  float errL = 0.0;
-  float errR = 0.0;
-	float last_errL = 0.0;
-  float last_errR = 0.0;
-  float total_errL = 0.0;
-  float total_errR = 0.0;
-	float delta_errL = 0.0;
-  float delta_errR = 0.0;
-	float voltL = 0.0;
-  float voltR = 0.0;
-  ResetMotor();
-  Brain.resetTimer();
-	while(Brain.timer(msec) < timeLimit){
-    float curL = LeftMotor2.rotation(deg);
-    float curR = RightMotor2.rotation(deg);
-    errL = target - curL;
-    errR = - target - curR;
-    if(curL / target > KI_START_PERCENT)  total_errL += errL;
-    if(curR / target > KI_START_PERCENT)  total_errR += errR;
-    delta_errL = errL - last_errL;
-    delta_errR = errR - last_errR;
-    if(errL < 1 || errR > -1){
-      sMove(0,0);
-      Move(0,0);
-      return true;
-    }
-
-    voltL = KP * errL + KI * total_errL + KD * delta_errL;
-    voltR = KP * errR + KI * total_errR + KD * delta_errR;
-
-    float acc = CONSTRAIN(Brain.timer(msec) / 1000, 0, 1);
-    voltL = voltL * acc;
-    voltR = voltR * acc;
-
-    float rpmAdjust = 0.0 * (LeftMotor1.velocity(rpm) - RightMotor2.velocity(rpm));// * (curL / target)
-		float rotationAdjust = 0.0 * (LeftMotor2.rotation(deg) - RightMotor2.rotation(deg));// * (curL / target)
-    Move(CONSTRAIN(voltL - rpmAdjust - rotationAdjust, -power, power),
-         CONSTRAIN(voltR + rpmAdjust + rotationAdjust, -power, power));
-
-    last_errL = errL;
-    last_errR = errR;
-		
-		sleep(10);
-	}
-  Stop(hold);
-  return false;
-}
-
-bool rushLeft(int power, float target, float timeLimit){
-  ResetMotor();
-  Brain.resetTimer();
-	while(Brain.timer(msec) < timeLimit){
-    if((fabs(LeftMotor2.rotation(deg)) + fabs(RightMotor2.rotation(deg))) / 2 > target){
-      return true;
-    }
-    else  Move(-power, power);
-  }
-  Stop(hold);
-  return false;
-}
-
-bool rushRight(int power, float target, float timeLimit){
-  ResetMotor();
-  Brain.resetTimer();
-	while(Brain.timer(msec) < timeLimit){
-    if((fabs(LeftMotor2.rotation(deg)) + fabs(RightMotor2.rotation(deg))) / 2 > target){
-      return true;
-    }
-    else  Move(power, -power);
-  }
-  Stop(hold);
-  return false;
-}
-
 bool turnLeftWithGyro(int power, float target, float timeLimit, bool fullTime, float P, float I, float D){
   ResetMotor();
   float cur = GyroGetAngle();
@@ -389,11 +258,11 @@ bool turnLeftWithGyro(int power, float target, float timeLimit, bool fullTime, f
   Brain.resetTimer();
   while (Brain.timer(msec) < timeLimit) {
     cur = GyroGetAngle();
-    last_err = err;
     err = target - cur;
     if(cur / target > KI_TURN_START_PERCENT)
       total_err += err;
     delta_err = err - last_err;
+    //0 -> -90 -> -93   err -90 -> -0.6 -> 0 -> 3
     if(err >= -0.6) {
       if(!fullTime) return true;
       else if(err <= 0.6) return true;
@@ -411,6 +280,7 @@ bool turnLeftWithGyro(int power, float target, float timeLimit, bool fullTime, f
     sMove(CONSTRAIN(OUT, -power, power),
           CONSTRAIN(-OUT, -power, power));
 
+    last_err = err;
     sleep(10);
   }
   Stop(hold);

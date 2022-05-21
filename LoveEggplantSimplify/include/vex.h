@@ -6,7 +6,7 @@
 /*    Description:  Default header for V5 projects                            */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-//
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,12 +15,15 @@
 #include "v5.h"
 #include "v5_vcs.h"
 
+//直行PID
 #define KP 0.6
 #define KI 0.07
 #define KD 4.0
+//陀螺仪转向PID
 #define KP_TURN 0.33
 #define KI_TURN 0.000
 #define KD_TURN 1.25
+//KI作用范围(行驶至多少百分比开始)
 #define KI_START_PERCENT 0.95
 #define KI_TURN_START_PERCENT 0.92
 #define KI_INDEX_PAR (1 - KI_START_PERCENT)
